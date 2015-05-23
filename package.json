@@ -1,0 +1,1 @@
+{"name":"link","version":"1.2.0","main":"goblintserver.exe","dependencies":{"opabsl.opp":"1.2.0","opa-js-runtime-cps":"1.2.0","goblintserver.controller.opx":"1.2.0"}}
