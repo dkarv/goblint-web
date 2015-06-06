@@ -15,5 +15,6 @@ function render(dot) {
     render(d3.select("svg g"), g);
 
     // make the svg big enough
+    // console.log(g.graph().width);
     $('svg').width(g.graph().width).height(g.graph().height);
 }

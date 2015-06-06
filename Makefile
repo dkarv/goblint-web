@@ -15,6 +15,9 @@ PLUGIN =
 PLUGINDIR =
 OTHER_DEPENDS = resources/*
 CONF_FILE = opa.conf
+# javascript bindings
+BINDINGS := $(wildcard resources/bind/*.js)
+
 
 #Compiler variables
 OPACOMPILER ?= opa

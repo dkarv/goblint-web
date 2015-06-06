@@ -1,7 +1,7 @@
 type vertex = {string name, string shape, string label}
 type edge = {string start, string end, string label}
 type graph = {list(edge) edges, list(vertex) vertices}
-type ana = { string id, string filename, string src, option(graph) cfg, option(string) dotfile}
+type ana = { string id, string filename, string src, option(graph) cfg, option(string) dotfile, intmap(loc) locs}
 
 database anas {
   ana /all[{id}]
@@ -14,12 +14,18 @@ module Model {
     /anas/all[{id:random}]/src = source;
     /anas/all[{id:random}]/filename = filename;
     save_cfg(random);
-    //save_result(random);
+    save_result(random);
     random
   }
 
-  function get_analysis(id) {
+  exposed function get_analysis(id) {
     /anas/all[{id: id}];
+  }
+
+  exposed function get_loc(id, line) {
+    /anas/all[id == id]/locs[line]
+    //Log.error("model","{l}")
+    //l
   }
 
   function upload_analysis(callback, form_data) {
@@ -38,15 +44,25 @@ module Model {
     },form_data.uploaded_files);
   }
 
-  function read_result(){
-    read_file("result.xml");
+  // test parser
+  //function test_parser(str){
+    //result res = Result.start_parsing(str);
+    //Log.error("view","parser testing finished: {res}");
+  //}
+
+  function save_result(id){
+    str = read_file("result.xml");
+    intmap(loc) ls = Result.start_parsing(str);
+    /anas/all[~{id}]/locs <- ls
+    Log.error("view","finished parsing");
   }
 
   function save_cfg(id){
     string s = read_file("cfg.dot");
     // parser not yet ready to parse everything
-    // g = parse_graph(s);
-    // /anas/all[~{id}]/cfg <- some(g)
+    g = parse_graph(s);
+    Log.error("parse g","{g}");
+    /anas/all[~{id}]/cfg <- some(g)
     /anas/all[~{id}]/dotfile <- some(s)
     s
   }
@@ -67,8 +83,7 @@ module Model {
 
     label = parser {
       case "label =" " "? "\""
-        lbl=(([a-zA-Z0-9*_(),%+=:.\200-\377]|"&quot;"|"&gt;"|"&lt;"|"&amp;"|" "|"\\")*)
-        ws* "\"": Text.to_string(lbl)
+        lbl = ((![\"] .)*) ws* "\"": Text.to_string(lbl)
     }
 
     shape = parser {
@@ -90,7 +105,6 @@ module Model {
         vertices=vertex_parser*
         "\}" ws*: {vertices: vertices, edges: edges}
     }
-    graph g = Parser.parse( graph_parser,str);
-    g
+    Parser.parse( graph_parser,str);
   }
 }

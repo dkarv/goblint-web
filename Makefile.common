@@ -52,7 +52,7 @@ $(BUILDDIR)/%.opp :
 # EXECUTABLE BUILDING
 $(EXE) : pack $(SRC) $(MAINSRC) $(DEPENDS) $(OTHER_DEPENDS)
 	@echo "### Building executable $(EXE) "
-	$(OPA) resources/bind/dotrenderer.js $(COMPILOPT) $(MAINSRC) $(CONFIG) $(PLUGIN:%=$(BUILDDIR)/%) -o $@ --build-dir $(BUILDDIR)/$(EXE)
+	$(OPA) $(BINDINGS) $(COMPILOPT) $(MAINSRC) $(CONFIG) $(PLUGIN:%=$(BUILDDIR)/%) -o $@ --build-dir $(BUILDDIR)/$(EXE)
 
 $(EXE:%.exe=%.run) : $(EXE)
 	./$(EXE) -p $(PORT)
@@ -67,6 +67,8 @@ pack.depends :
 clean ::
 	@$(PCK:%.opx=make -C $(PCKDIR)/% clean &&) $(PLUGIN:%.opp=make -C $(PLUGINDIR)/% clean &&) echo "### Cleaning $(BUILDDIR)";
 	$(RM) $(BUILDDIR) 2>/dev/null
-	$(RMFILE) $(EXE) 2>/dev/null 
+	$(RMFILE) $(EXE) 2>/dev/null
+	$(RM) input 2>/dev/null
+	$(RM) _tracks 2>/dev/null
 	
 

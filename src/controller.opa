@@ -45,6 +45,15 @@ module Controller {
       default:
         Resource.raw_response("no body specified", "text/plain", {bad_request});
       }
+    //case ["testparser"]:
+    //  match (HttpRequest.get_body()){
+    //    case {~some}:
+    //      Log.error("Controller","{some}");
+    //      Model.test_parser(some);
+    //      Resource.raw_response("fine", "text/plain", {success});
+    //    case {none}:
+    //      Resource.raw_response("no body specified", "text/plain", {bad_request});
+    //  }
     default:
       Resource.raw_status({bad_request});
     }
@@ -66,8 +75,10 @@ Server.start(Server.http, [
   { register:
     [ { doctype: { html5 } },
       { js: [ "/resources/lib/d3.min.js", "/resources/lib/dagre.min.js",
-      "/resources/lib/dagre-d3.min.js", "/resources/lib/graphlib-dot.min.js " ] },
-      { css: [ "/resources/css/graph.css", "/resources/css/layout.css"] }
+        "/resources/lib/dagre-d3.min.js", "/resources/lib/graphlib-dot.min.js",
+        "/resources/lib/prettify.js"] },
+      { css: [ "/resources/css/layout.css", "/resources/css/prettify.css"] },
+      { favicon: [ Favicon.make({ico},"/resources/favicon.ico")]}
     ]
   },
   { ~resources },

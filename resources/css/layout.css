@@ -19,3 +19,18 @@ text {
     stroke: #333;
     stroke-width: 1.5px;
 }
+
+#cfg-container, #src-container {
+    width: 50%;
+    float: right;
+}
+
+#loc-container {
+    width: 50%;
+    float: left;
+}
+
+/* display line number in each line TODO do we want that? */
+.prettyprint ol.linenums > li {
+    list-style-type: decimal;
+}
