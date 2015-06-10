@@ -24,8 +24,6 @@ module Model {
 
   exposed function get_loc(id, line) {
     /anas/all[id == id]/locs[line]
-    //Log.error("model","{l}")
-    //l
   }
 
   function upload_analysis(callback, form_data) {
@@ -39,16 +37,10 @@ module Model {
       Log.error("upload","goblint: {out}");
       // save analysis cfg
       id = save_analysis(val.filename, Binary.to_string(val.content));
-      callback(get_analysis(id));
+      callback(id);
       Log.error("upload","finished upload and analyzing: {id}");
     },form_data.uploaded_files);
   }
-
-  // test parser
-  //function test_parser(str){
-    //result res = Result.start_parsing(str);
-    //Log.error("view","parser testing finished: {res}");
-  //}
 
   function save_result(id){
     str = read_file("result.xml");
@@ -59,7 +51,6 @@ module Model {
 
   function save_cfg(id){
     string s = read_file("cfg.dot");
-    // parser not yet ready to parse everything
     g = parse_graph(s);
     Log.error("parse g","{g}");
     /anas/all[~{id}]/cfg <- some(g)

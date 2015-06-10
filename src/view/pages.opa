@@ -1,50 +1,97 @@
+type tab = {upload} or {src} or {cfg}
+
 module Pages {
+
   // returns the html for the nav tabs
-  function menu(){
+  function menu(tab active, list(tab) display, list(tab) disabled){
     <ul class="nav nav-tabs">
-      <li data-target="#upload">
-        <a id=#upload-tab data-target="#upload" onclick={function (_) Tab.show(#upload-tab)}>Upload</a></li>
-      <li class="disabled" id=#cfg-tab-parent>
-        <a id=#cfg-tab data-target="#cfg" onclick={Cfg.show_cfg}>CFG</a>
-      </li>
-      <li class="disabled" id=#src-tab-parent data-target="#src">
-        <a id=#src-tab data-target="#src" onclick={Src.show_src}>Source</a>
-      </li>
+      { List.map(function(el){
+          list(string) classes = if(el == active){ ["active"] } else {[]};
+          classes = if(List.mem(el, disabled)){ ["disabled" | classes] } else {classes}
+          List.fold(Xhtml.update_class, classes, produce_menu(el))
+        }, display)
+      }
     </ul>
   }
 
-  function uploadtab(){
-    Upload.config default_config = Upload.default_config();
-    form_body =
-      <input type="file" name="filename"/>
-      <input type="hidden" name="form_id" value="default"/>
-      <input type="submit" value="Upload" onclick={function(_) Dom.add_class( #cfg-tab-parent, "disabled")}/>
-
-    Upload.config my_config = {
-      {default_config with form_body: form_body} with process:
-        Model.upload_analysis(View.analysis_finished,_)
+  function tabs(tab active, list(tab) display){
+    <div class="tab-content" id=#tabs>
+      { List.map(function(el){
+          if (el == active){
+            Xhtml.update_class("active",produce_tab(el))
+          }else{
+            produce_tab(el)
+          }
+        }, display)
       }
-    <div class="tab-pane" id="upload">
-      {Upload.html(my_config)}
     </div>
   }
 
-  function srctab(){
-    <div class="tab-pane" id=#src>
-      <div id=#loc-container>
+  function produce_menu(tab t){
+    match(t) {
+    case {upload}:
+      <li data-target="#upload">
+        <a id=#upload-tab data-target="#upload"
+          onclick={function (_) Tab.show(#upload-tab)}>Upload</a>
+      </li>
+    case {cfg}:
+      <li id=#cfg-tab-parent>
+        <a id=#cfg-tab data-target="#cfg"
+          onclick={function(_) { Cfg.show()}}
+          onready={function(_) {
+            if( Dom.has_class( #cfg-tab-parent, "active")){
+              Cfg.show()
+            }
+          }}
+        >CFG</a>
+      </li>
+    case {src}:
+      <li id=#src-tab-parent data-target="#src">
+        <a id=#src-tab data-target="#src"
+          onclick={function(_) {Src.show()}}
+          onready={function(_) {
+            if( Dom.has_class( #src-tab-parent, "active")){
+              Src.show()
+            }
+          }}
+        >Source</a>
+      </li>
+    }
+  }
+
+  function produce_tab(tab t){
+    match(t){
+    case {upload}:
+      Upload.config default_config = Upload.default_config();
+      form_body =
+        <input type="file" name="filename"/>
+        <input type="hidden" name="form_id" value="default"/>
+        <input type="submit" value="Upload"
+          onclick={function(_){
+            Dom.add_class( #cfg-tab-parent, "disabled");
+            Dom.add_class( #src-tab-parent, "disabled");
+          }}/>
+
+      Upload.config my_config = {
+        {default_config with form_body: form_body} with process:
+          Model.upload_analysis(View.analysis_finished,_)
+      }
+      <div class="tab-pane" id="upload">
+        {Upload.html(my_config)}
       </div>
-      <pre class="prettyprint linenums" id=#src-container>
-      </pre>
-    </div>
-  }
-
-  function cfgtab(){
-    <div class="tab-pane" id=#cfg>
-      <div id=#cfg-container>
-        <svg></svg>
+    case {src}:
+      <div class="tab-pane" id=#src>
+        <div id=#loc-container>
+        </div>
+        <pre class="prettyprint linenums" id=#src-container>
+        </pre>
       </div>
-    </div>
+    case {cfg}:
+      <div class="tab-pane" id=#cfg>
+        <div id=#cfg-container>
+          <svg></svg>
+        </div>
+      </div>
+    }
   }
-
-
 }

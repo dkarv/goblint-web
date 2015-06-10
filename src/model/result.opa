@@ -54,7 +54,7 @@ module Result{
     }
 
     analysis_parser = parser {
-      case "<analysis name=" ~str ">"
+      case "<analysis name=" str ">"
         locs = loc_parser*
         "</analysis>"
         ws*: Map.From.assoc_list(List.map(function(ll) { (ll.line, ll) },locs))

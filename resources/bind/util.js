@@ -14,3 +14,10 @@ function register_line_handler(type, callback) {
 function test() {
 
 }
+
+/**
+ * @register { string -> void}
+ */
+function pushState(str){
+    history.replaceState({}, "", str);
+}

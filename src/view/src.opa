@@ -1,16 +1,19 @@
 module Src{
 
-  client function show_src(_){
+  client function show(){
     match(View.get_analysis_id()){
     case {none}:
       Log.error("src", "analysis not finished yet");
-    case {~some}:
-      src = Model.get_analysis(some).src;
+    case {some: id}:
+      src = Model.get_analysis(id).src;
       Log.debug("src", "{src}");
       Tab.show(#src-tab);
       Dom.set_text(#src-container, src);
+      // pretty print refuses to pretty print again if class prettyprinted is there
+      Dom.remove_class(#src-container, "prettyprinted");
       pretty_print();
       register_handler("click",callback);
+      %%Util.pushState%%("/ana/" ^ id ^ "/src");
     }
   }
 
