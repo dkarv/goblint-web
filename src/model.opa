@@ -33,7 +33,7 @@ module Model {
       string file = "input/" ^ val.filename;
       File.write(file, val.content);
       // call goblint
-      string out = System.exec(analyzer ^ " --sets outfile result.xml --sets result indented --set justcfg true " ^ file, "");
+      string out = System.exec(analyzer ^ " --sets outfile result.xml --sets result fast_xml --set justcfg true " ^ file, "");
       Log.error("upload","goblint: {out}");
       // save analysis cfg
       id = save_analysis(val.filename, Binary.to_string(val.content));
@@ -44,9 +44,26 @@ module Model {
 
   function save_result(id){
     str = read_file("result.xml");
-    intmap(loc) ls = Result.start_parsing(str);
-    /anas/all[~{id}]/locs <- ls
+    // intmap(loc) ls = Result.start_parsing(str);
+    // /anas/all[~{id}]/locs <- ls
     Log.error("view","finished parsing");
+  }
+
+  exposed function debug_parser(){
+    // str = read_file("test.xml");
+    // xmltest = Xmlns.try_parse(str);
+    // Log.error("Debug Parser", "{xmltest}");
+    // result = Result.parse_xml(str);
+    // Log.error("Debug Parser","{result}");
+    string out = System.exec("xml-json test.xml run","")
+    res = Json.deserialize(out);
+    string msg = match(res){
+      case {none}: "could not parse the result.xml... Please install xml-json: npm install xml-json -g"
+      case ~{some}:
+        result = Result.parse_json(some);
+        "{result}"
+    }
+    Log.trace("Debug Msg", msg)
   }
 
   function save_cfg(id){

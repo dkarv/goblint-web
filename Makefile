@@ -24,7 +24,10 @@ OPACOMPILER ?= opa
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
 PORT = 8080
 
-RUN_OPT =
+RUN_OPT = --verbose 8
+# 8: everything
+# 7: debug, but not info
+# 6: default, no debug
 
 default: exe
 

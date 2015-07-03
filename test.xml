@@ -1,0 +1,209 @@
+<analysis name="Who cares?">
+  <Loc file="input/01-assert.c" line="4" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Leaf text="Value"/>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="5" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Node text="Value">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map">
+            <Node text="Local" id="Local">
+              <Leaf text="unknown -> Unknown int" id="unknown"/>
+              <Leaf text="fail -> Unknown int" id="fail"/>
+              <Leaf text="silence -> Unknown int" id="silence"/>
+              <Leaf text="success -> Unknown int" id="success"/>
+            </Node>
+          </Node>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="7" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Node text="Value">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map">
+            <Node text="Local" id="Local">
+              <Leaf text="unknown -> Unknown int" id="unknown"/>
+              <Leaf text="fail -> Unknown int" id="fail"/>
+              <Leaf text="silence -> 1" id="silence"/>
+              <Leaf text="success -> 1" id="success"/>
+            </Node>
+          </Node>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="6" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Node text="Value">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map">
+            <Node text="Local" id="Local">
+              <Leaf text="unknown -> Unknown int" id="unknown"/>
+              <Leaf text="fail -> Unknown int" id="fail"/>
+              <Leaf text="silence -> Unknown int" id="silence"/>
+              <Leaf text="success -> 1" id="success"/>
+            </Node>
+          </Node>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="12" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Leaf text="Value"/>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="10" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Node text="Value">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map">
+            <Node text="Local" id="Local">
+              <Leaf text="unknown -> Unknown int" id="unknown"/>
+              <Leaf text="fail -> 0" id="fail"/>
+              <Leaf text="silence -> 1" id="silence"/>
+              <Leaf text="success -> 1" id="success"/>
+            </Node>
+          </Node>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="13" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Leaf text="Value"/>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="11" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Leaf text="Value"/>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="4" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Node text="Value">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+    </Node>
+  </Loc>
+  <Loc file="input/01-assert.c" line="9" fun="main">
+    <Node text="main()">
+      <Node text="Context">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map"/>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+      <Node text="Value">
+        <Leaf text="Lock Set: {}"/>
+        <Leaf text="Escaped Variables: {}"/>
+        <Node text="(mapping, main!)">
+          <Node text="mapping" id="map">
+            <Node text="Local" id="Local">
+              <Leaf text="unknown -> Unknown int" id="unknown"/>
+              <Leaf text="fail -> 0" id="fail"/>
+              <Leaf text="silence -> 1" id="silence"/>
+              <Leaf text="success -> 1" id="success"/>
+            </Node>
+          </Node>
+          <Leaf text="main!"/>
+        </Node>
+      </Node>
+    </Node>
+  </Loc>
+</analysis>

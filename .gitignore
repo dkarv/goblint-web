@@ -2,3 +2,8 @@ access.log
 cfg.dot
 error.log
 result.xml
+.idea
+_build
+_tracks
+goblintserver.exe
+opa-debug

@@ -18,6 +18,7 @@ module View {
     html = <>
       {Pages.menu({upload}, [{upload}, {src}, {cfg}],[{src}, {cfg}])}
       {Pages.tabs({upload},[{upload},{src},{cfg}])}
+      <a href="#" onclick={function(_) {Model.debug_parser()}}>Test Parser</a>
       </>
     Resource.page("Goblint | Upload", html);
   }
