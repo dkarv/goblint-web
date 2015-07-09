@@ -1,7 +1,7 @@
 type vertex = {string name, string shape, string label}
 type edge = {string start, string end, string label}
 type graph = {list(edge) edges, list(vertex) vertices}
-type ana = { string id, string filename, string src, option(graph) cfg, option(string) dotfile, intmap(loc) locs}
+type ana = { string id, string filename, string src, option(graph) cfg, option(string) dotfile, run run}
 
 database anas {
   ana /all[{id}]
@@ -9,10 +9,10 @@ database anas {
 
 module Model {
 
-  function save_analysis(filename, source) {
+  function save_analysis(filename, list((string, arg)) args, source) {
     string random = Random.string(8);
-    /anas/all[{id:random}]/src = source;
-    /anas/all[{id:random}]/filename = filename;
+    /anas/all[{id: random}]/src = source;
+    /anas/all[{id: random}]/filename = filename;
     save_cfg(random);
     save_result(random);
     random
@@ -22,31 +22,46 @@ module Model {
     /anas/all[{id: id}];
   }
 
-  exposed function get_loc(id, line) {
-    /anas/all[id == id]/locs[line]
+  exposed function option(call) get_call(id, line) {
+    intmap(call) calls = /anas/all[id == id]/run/calls;
+    Map.get(line, calls);
+    /*a = match(r){
+      case {none}: {none}
+      case ~{some}: some.calls[line];
+    };
+    a*/
+    //r.calls[line];
   }
 
-  function upload_analysis(callback, form_data) {
+  function upload_analysis(callback, list((string, arg)) args, form_data) {
     string analyzer = "../analyzer/goblint"
     Map.iter(function(key, val) {
       // save the file in a subdirectory TODO add timestamp / any other identification
       string file = "input/" ^ val.filename;
       File.write(file, val.content);
       // call goblint
-      string out = System.exec(analyzer ^ " --sets outfile result.xml --sets result fast_xml --set justcfg true " ^ file, "");
-      Log.error("upload","goblint: {out}");
+      string out = System.exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
+      Log.info("upload","goblint: {out}");
       // save analysis cfg
-      id = save_analysis(val.filename, Binary.to_string(val.content));
+      id = save_analysis(val.filename, args, Binary.to_string(val.content));
       callback(id);
       Log.error("upload","finished upload and analyzing: {id}");
     },form_data.uploaded_files);
   }
 
   function save_result(id){
-    str = read_file("result.xml");
-    // intmap(loc) ls = Result.start_parsing(str);
-    // /anas/all[~{id}]/locs <- ls
-    Log.error("view","finished parsing");
+    // xml -> json
+    string out = System.exec("xml-json result.xml run", "");
+    // json -> object
+    option(RPC.Json.json) res = Json.deserialize(out);
+    option(run) result = match(res){
+      case {none}: @fail("could not parse result.xml... Please install xml-json: npm install xml-json -g");
+      case ~{some}: Result.parse_json(some);
+    }
+    match(result){
+      case {none}: @fail("Can not parse json");
+      case ~{some}: /anas/all[~{id}]/run <- some; Log.info("Model", "save run to database");
+    }
   }
 
   exposed function debug_parser(){
@@ -63,7 +78,7 @@ module Model {
         result = Result.parse_json(some);
         "{result}"
     }
-    Log.trace("Debug Msg", msg)
+    Log.info("Debug Msg", msg)
   }
 
   function save_cfg(id){

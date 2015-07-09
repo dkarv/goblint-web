@@ -34,4 +34,12 @@ module View {
     </>
     Resource.page("Goblint | {t}", html);
   }
+
+  function list((string, arg)) parse_arguments(){
+    list(string) keys = Arguments.get_keys();
+    List.map(function(s){
+      //elem = #s;
+      ("test", {str: "asdf"})
+    }, Arguments.get_keys());
+  }
 }

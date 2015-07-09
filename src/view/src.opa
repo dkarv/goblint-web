@@ -22,30 +22,53 @@ module Src{
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
-        loc l = Model.get_loc(id, line);
-        Log.debug("src", "{l}");
-        res = <>
-          <h3>{l.file}:{line}</h3>
-          <ul>
-            {List.map(print_loc,l.values)}
-          </ul>
-        </>
+        option(call) c = Model.get_call(id, line);
+        Log.debug("src", "{c}");
+        res = match(c){
+          case {none}: <h3>No information available</h3>
+          case {some: cl}:
+            <>
+              <h3>{cl.file}:{line}</h3>
+              <h4>Context: </h4>
+                {print_analysis(cl.context)}
+              <h4>Path: </h4>
+                {print_analysis(cl.path)}
+            </>
+        }
         Dom.put_inside(#loc-container, Dom.of_xhtml(res));
         Log.debug("src","done");
-
     }
   }
 
-  recursive client function print_loc(elem){
-    match(elem){
-      case {~children, ~text, ~id}:
-        <li>{text}
-          <ul>
-            {List.map(print_loc, children)}
-          </ul>
-        </li>
-      case {~text, ~id}:
-        <li>{text}</li>
+  client function print_analysis(ana){
+    <>
+      {List.map(function(an){
+        <>
+          <h5>{an.name}:</h5>
+          {print_value(an.val)}
+        </>},
+      ana)}
+    </>;
+  }
+
+  client function xhtml print_value(val){
+    match(val){
+    case ~{map}:
+      <ul>{List.fold(function((key,val), acc){
+          <>
+            {acc}
+            <li>{key}: -> {val}</li>
+          </>
+        },
+        Map.To.assoc_list(Map.map(print_value, map)), <></>)}</ul>
+    case ~{set}:
+      <ul>{List.fold(function(el, acc){
+        <>
+          {acc}
+          <li>{el}</li>
+        </>},set, <></>)}</ul>
+    case ~{data}:
+      <span>{data}</span>
     }
   }
 

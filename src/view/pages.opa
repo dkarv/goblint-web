@@ -9,8 +9,16 @@ module Pages {
           list(string) classes = if(el == active){ ["active"] } else {[]};
           classes = if(List.mem(el, disabled)){ ["disabled" | classes] } else {classes}
           List.fold(Xhtml.update_class, classes, produce_menu(el))
-        }, display)
+        }, display);
       }
+      <li class="dropdown pull-right">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+          Goblint Arguments <span class="caret"></span>
+        </a>
+        <form class="dropdown-menu form-horizontal row" id=#arguments>
+          {Arguments.html(Arguments.get_defaults())}
+        </form>
+      </li>
     </ul>
   }
 
@@ -73,8 +81,9 @@ module Pages {
           }}/>
 
       Upload.config my_config = {
-        {default_config with form_body: form_body} with process:
-          Model.upload_analysis(View.analysis_finished,_)
+        {default_config with form_body: form_body} with process: {
+          Model.upload_analysis(View.analysis_finished,View.parse_arguments(),_);
+        }
       }
       <div class="tab-pane" id="upload">
         {Upload.html(my_config)}

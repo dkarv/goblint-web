@@ -23,7 +23,7 @@ Server.start(Server.http, [
       { js: [ "/resources/lib/d3.min.js", "/resources/lib/dagre.min.js",
         "/resources/lib/dagre-d3.min.js", "/resources/lib/graphlib-dot.min.js",
         "/resources/lib/prettify.js"] },
-      { css: [ "/resources/css/layout.css", "/resources/css/prettify.css"] },
+      { css: [ "/resources/css/layout.css", "/resources/css/prettify.css", "/resources/css/titatoggle.min.css"] },
       { favicon: [ Favicon.make({ico},"/resources/favicon.ico")]}
     ]
   },

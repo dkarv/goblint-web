@@ -34,3 +34,15 @@ text {
 .prettyprint ol.linenums > li {
     list-style-type: decimal;
 }
+
+#arguments{
+    min-width: 600px;
+}
+
+.form-control{
+    width: 80%;
+}
+
+.form-horizontal .form-group {
+    margin-right: 0;
+}

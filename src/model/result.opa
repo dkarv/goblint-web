@@ -41,7 +41,7 @@ type file = {
 type run = {
   string parameters,
   list(file) files,
-  list(call) calls
+  intmap(call) calls
 }
 
 module Result{
@@ -203,9 +203,13 @@ module Result{
 
       fs_cs = match(find(r1, "result")){
         case {some: {Record: r2}}:
+          list(call) calls = parse_list(find(r2, "call"), parse_call);
+          intmap(call) cs = List.fold(function(el, cs){
+            Map.add(el.line, el, cs);
+          }, calls, Map.empty);
           { fs: parse_list(find(r2, "file"), parse_file),
-            cs: parse_list(find(r2, "call"), parse_call)}
-        default: {fs: [], cs: []}
+            cs: cs}
+        default: {fs: [], cs: Map.empty}
       }
 
       {some: {parameters: par, files: fs_cs.fs, calls: fs_cs.cs}}
