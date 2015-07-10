@@ -5,7 +5,7 @@ module Cfg{
       case {none}:
         Log.error("cfg", "analysis not finished yet");
       case {some: id}:
-        match(Model.get_analysis(id).dotfile){
+        match(Model.get_dotfile(id)){
           case {none}:
             Log.error("cfg", "no cfg found");
           case {some: dot}:

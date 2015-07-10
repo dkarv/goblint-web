@@ -152,7 +152,24 @@ module Result{
   function option(value) parse_set(list((string, RPC.Json.json)) ls){
     match(find(ls, "set")){
       case {some: {Record: r}} as children:
-        {some: {set: parse_list(children, parse_value)}};
+        list(value) vals = List.filter_map(function(elem){
+          match(elem){
+            case ("value", {Record: r}):
+              {some: parse_value(r)}
+            default:
+              Log.debug("Result","no value? {elem}");
+              {none}
+          }
+          /*if(name == "value"){
+            // {some: parse_value(value)}
+            {some: {data: "TEST"}}
+          }else{
+            {none}
+          }*/
+        }, r);
+        Log.debug("Result","{children}");
+        Log.debug("Result2","{vals}");
+        {some: {set: vals}} //parse_list(children, parse_value)}};
       case {none}:
         {none}
       case {some: {String: s}}:

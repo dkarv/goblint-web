@@ -5,7 +5,7 @@ module Src{
     case {none}:
       Log.error("src", "analysis not finished yet");
     case {some: id}:
-      src = Model.get_analysis(id).src;
+      src = Model.get_src(id);
       Log.debug("src", "{src}");
       Tab.show(#src-tab);
       Dom.set_text(#src-container, src);
@@ -14,6 +14,7 @@ module Src{
       pretty_print();
       register_handler("click",callback);
       %%Util.pushState%%("/ana/" ^ id ^ "/src");
+      Log.debug("Src","ready with source");
     }
   }
 

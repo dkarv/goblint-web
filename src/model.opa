@@ -22,6 +22,14 @@ module Model {
     /anas/all[{id: id}];
   }
 
+  exposed function get_src(id){
+    /anas/all[{id: id}]/src
+  }
+
+  exposed function get_dotfile(id){
+      /anas/all[{id: id}]/dotfile
+    }
+
   exposed function option(call) get_call(id, line) {
     intmap(call) calls = /anas/all[id == id]/run/calls;
     Map.get(line, calls);
