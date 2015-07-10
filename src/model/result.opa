@@ -96,49 +96,88 @@ module Result{
     ~{name, path, fkt}
   }
 
-  recursive function value parse_value(list((string, RPC.Json.json)) ls){
+  function option(value) parse_data(list((string, RPC.Json.json)) ls){
     match(find(ls, "data")){
-      case {some: {String: s}}: {data: String.strip(s)}
-      case {none}: match(find(ls, "map")){
-        case {some: {Record: r}}:
-          list(string) keys = match(find(r, "key")){
-            case {some: {String: s}}: [s]
-            case {some: {List: rs}}: List.filter_map(function (el) {
-              match(el){
-                case {String: s}: {some: String.strip(s)}
-                default: {none}
-              }
-            },rs);
-            default: @fail("can't parse key list");
-          }
+      case {some: {String: s}}:
+        {some: {data: String.strip(s)}}
+      case {none}:
+        {none}
+      default:
+        @fail("TODO no data? {ls}");
+    }
+  }
 
-          list(value) values = match(find(r, "value")){
-            case {some: {Record: r}}: [parse_value(r)];
-            case {some: {List: l}}: List.filter_map(function (el) {
-              match(el){
-                case {Record: r}: {some: parse_value(r)};
-                default: {none}
-              }
-            }, l);
-            default: @fail("can't parse value list");
-          }
-
-          values ++ match(find(r,"_")){
-            // sometimes there is a string after the last key
-            case {some: {String: s}}: [{data: String.strip(s)}];
-            default: [];
-          }
-
-          {map: Map.From.assoc_list(List.zip(keys, values))}
-        case {none}: match(find(ls, "set")){
-          case {some: {Record: r}} as children:
-            {set: parse_list(children, parse_value)};
-          case {none}: @fail("unknown value: no set, map or data");
-          default: {set: List.empty};
+  function option(value) parse_map(list((string, RPC.Json.json)) ls){
+    match(find(ls, "map")){
+      case {some: {Record: r}}:
+        list(string) keys = match(find(r, "key")){
+          case {some: {String: s}}: [s]
+          case {some: {List: rs}}: List.filter_map(function (el) {
+            match(el){
+              case {String: s}: {some: String.strip(s)}
+              default: {none}
+            }
+          },rs);
+          default: @fail("can't parse key list");
         }
-        default: {map: Map.empty}; // empty string for example
-      }
-      default: @fail("value unknown");
+
+        list(value) values = match(find(r, "value")){
+          case {some: {Record: r}}: [parse_value(r)];
+          case {some: {List: l}}: List.filter_map(function (el) {
+            match(el){
+              case {Record: r}: {some: parse_value(r)};
+              default: {none}
+            }
+          }, l);
+          default: @fail("can't parse value list");
+        }
+
+        values ++ match(find(r,"_")){
+          // sometimes there is a string after the last key
+          case {some: {String: s}}: [{data: String.strip(s)}];
+          default: [];
+        }
+
+        {some: {map: Map.From.assoc_list(List.zip(keys, values))}}
+      case {some: {String: s}}:
+        // empty string
+        {some: {map: Map.empty}}
+      case {none}:
+        {none}
+      default:
+        @fail("TODO no map? {ls}");
+    }
+  }
+
+  function option(value) parse_set(list((string, RPC.Json.json)) ls){
+    match(find(ls, "set")){
+      case {some: {Record: r}} as children:
+        {some: {set: parse_list(children, parse_value)}};
+      case {none}:
+        {none}
+      case {some: {String: s}}:
+        {some: {set: []}}
+      default:
+        @fail("TODO no set? {ls}");
+    }
+  }
+
+  recursive function value parse_value(list((string, RPC.Json.json)) ls){
+    match(parse_data(ls)){
+      case {some: d}:
+        d
+      case {none}:
+        match(parse_map(ls)){
+          case {some: m}:
+            m
+          case {none}:
+            match(parse_set(ls)){
+              case {some: s}:
+                s
+              case {none}:
+                @fail("TODO no set, map or data: {ls}");
+            }
+        }
     }
   }
 

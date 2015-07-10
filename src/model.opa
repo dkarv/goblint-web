@@ -34,8 +34,9 @@ module Model {
   }
 
   function upload_analysis(callback, list((string, arg)) args, form_data) {
-    string analyzer = "../analyzer/goblint"
+    Log.debug("Model","upload");
     Map.iter(function(key, val) {
+      Log.debug("Model","test");
       // save the file in a subdirectory TODO add timestamp / any other identification
       string file = "input/" ^ val.filename;
       File.write(file, val.content);

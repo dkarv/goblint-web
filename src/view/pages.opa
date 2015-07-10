@@ -81,8 +81,8 @@ module Pages {
           }}/>
 
       Upload.config my_config = {
-        {default_config with form_body: form_body} with process: {
-          Model.upload_analysis(View.analysis_finished,View.parse_arguments(),_);
+        {default_config with form_body: form_body} with process: function(res) {
+          Model.upload_analysis(View.analysis_finished,View.parse_arguments(),res);
         }
       }
       <div class="tab-pane" id="upload">

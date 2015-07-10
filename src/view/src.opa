@@ -35,7 +35,7 @@ module Src{
                 {print_analysis(cl.path)}
             </>
         }
-        Dom.put_inside(#loc-container, Dom.of_xhtml(res));
+        dom d = Dom.put_inside(#loc-container, Dom.of_xhtml(res));
         Log.debug("src","done");
     }
   }

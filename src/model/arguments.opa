@@ -4,7 +4,8 @@ module Arguments{
   list((string, arg)) args = [
     ("analyzer", {str: "../analyzer/goblint"}),
     ("dopartial", {bln: false}),
-    ("noverify", {bln: false})
+    ("noverify", {bln: false}),
+    ("exp.cfgdot", {bln: false})
   ];
 
   /* arguments necessary for this webinterface. */
@@ -70,6 +71,7 @@ module Arguments{
   }
 
   function string analyzer_call(list((string, arg)) args){
+    Log.debug("Arguments","{args}");
     string analyzer = match(Option.get(List.assoc("analyzer", args))){
       case ~{str}: str;
       default: @fail("nonsense");

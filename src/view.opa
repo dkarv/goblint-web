@@ -14,11 +14,12 @@ module View {
   }
 
   // displays the whole page
+  // <a href="#" onclick={function(_) {Model.debug_parser()}}>Test Parser</a>
   function show_root() {
-    html = <>
-      {Pages.menu({upload}, [{upload}, {src}, {cfg}],[{src}, {cfg}])}
-      {Pages.tabs({upload},[{upload},{src},{cfg}])}
-      <a href="#" onclick={function(_) {Model.debug_parser()}}>Test Parser</a>
+    html =
+      <>
+        {Pages.menu({upload}, [{upload}, {src}, {cfg}],[{src}, {cfg}])}
+        {Pages.tabs({upload},[{upload}, {src}, {cfg}])}
       </>
     Resource.page("Goblint | Upload", html);
   }
@@ -35,11 +36,20 @@ module View {
     Resource.page("Goblint | {t}", html);
   }
 
-  function list((string, arg)) parse_arguments(){
+  client function list((string, arg)) parse_arguments(){
     list(string) keys = Arguments.get_keys();
-    List.map(function(s){
-      //elem = #s;
-      ("test", {str: "asdf"})
+    List.filter_map(function(s){
+      elem = Dom.select_id(s);
+      option(string) attr = Dom.get_attribute(elem, "type");
+      match(attr){
+        case {some: "text"}:
+          // TODO set or sets?
+          {some: (s, {str: Dom.get_value(elem)})};
+        case {some: "checkbox"}:
+          {some: (s, {bln: Dom.is_checked(elem)})};
+        default:
+          {none};
+      }
     }, Arguments.get_keys());
   }
 }
