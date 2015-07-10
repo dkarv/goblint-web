@@ -66,7 +66,7 @@ module Src{
       <ul>{List.fold(function(el, acc){
         <>
           {acc}
-          <li>{el}</li>
+          <li>{print_value(el)}</li>
         </>},set, <></>)}</ul>
     case ~{data}:
       <span>{data}</span>
