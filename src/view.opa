@@ -1,5 +1,8 @@
 module View {
 
+  // TODO choose local file
+  // TODO codemirror -> change file -> rerun goblint
+
   client function get_analysis_id(){
     Dom.get_attribute(#tabs, "ana-id");
   }
@@ -36,20 +39,40 @@ module View {
     Resource.page("Goblint | {t}", html);
   }
 
-  client function list((string, arg)) parse_arguments(){
-    list(string) keys = Arguments.get_keys();
-    List.filter_map(function(s){
-      elem = Dom.select_id(s);
-      option(string) attr = Dom.get_attribute(elem, "type");
-      match(attr){
-        case {some: "text"}:
-          // TODO set or sets?
-          {some: (s, {str: Dom.get_value(elem)})};
-        case {some: "checkbox"}:
-          {some: (s, {bln: Dom.is_checked(elem)})};
-        default:
-          {none};
+  client function list((string, arg)) parse_arguments(string prefix, list((string, arg)) defaults){
+    List.map(function((s,def)){
+      string selector = "[arg-id='" ^ Dom.escape_selector(s) ^ "']";
+      Log.debug("View",selector);
+      match(def){
+        case ~{val}:
+          elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
+          (s, {val: Dom.get_value(elem)})
+        case ~{str}:
+          elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
+          (s, {str: Dom.get_value(elem)})
+        case ~{bln}:
+          elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
+          (s, {bln: Dom.is_checked(elem)})
+        case ~{opts, sels}:
+          elems = Dom.select_raw_unsafe(prefix ^ "select" ^ selector ^ " option:selected");
+          (s, {opts:opts, sels:
+            Dom.fold(function(d, l){
+              match(List.index(Dom.get_value(d), opts)){
+                case {some: i}: l ++ [i];
+                case {none}: l;
+              }
+            }, [], elems)
+          });
+        case ~{opts, sel}:
+          elem = Dom.select_raw_unsafe(prefix ^ selector);
+          Log.error("View",Dom.get_value(elem));
+          (s, ~{opts: opts, sel: match(List.index(Dom.get_value(elem),opts)){
+            case ~{some}: some;
+            case {none}: sel;
+          }});
+        case ~{section}:
+          (s, {section: parse_arguments(prefix ^ selector ^ " ", section)});
       }
-    }, Arguments.get_keys());
+    }, defaults);
   }
 }

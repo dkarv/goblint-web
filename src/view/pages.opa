@@ -16,7 +16,7 @@ module Pages {
           Goblint Arguments <span class="caret"></span>
         </a>
         <form class="dropdown-menu form-horizontal row" id=#arguments>
-          {Arguments.html(Arguments.get_defaults())}
+            {Arguments.html(Arguments.get_defaults())}
         </form>
       </li>
     </ul>
@@ -82,7 +82,7 @@ module Pages {
 
       Upload.config my_config = {
         {default_config with form_body: form_body} with process: function(res) {
-          Model.upload_analysis(View.analysis_finished,View.parse_arguments(),res);
+          Model.upload_analysis(View.analysis_finished,View.parse_arguments("",Arguments.get_defaults()),res);
         }
       }
       <div class="tab-pane" id="upload">

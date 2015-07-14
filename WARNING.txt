@@ -1,0 +1,10 @@
+
+
+=========
+DO NOT USE OR FIX FIRST:
+=========
+do not use bootstrap collapse: some other library seems to destroy it's functionality.
+Collapsing or uncollapsing works only once, then clicking the trigger stops working
+
+do not use the xml parser. It produces stack overflows even for small .xml files
+
