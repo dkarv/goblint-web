@@ -24,7 +24,7 @@ OPACOMPILER ?= opa
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
 PORT = 8080
 
-RUN_OPT = --verbose 8
+RUN_OPT = --verbose 8 --goblint "../analyzer/goblintasfd"
 # 8: everything
 # 7: debug, but not info
 # 6: default, no debug
@@ -32,6 +32,6 @@ RUN_OPT = --verbose 8
 default: exe
 
 run: exe
-	$(RUN_CMD) $(RUN_OPT) || true
+	$(RUN_CMD) $(RUN_OPT)
 
 include Makefile.common
