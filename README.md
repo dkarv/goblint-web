@@ -14,7 +14,7 @@ and open
     
     http://localhost:8080
 
-The goblint executable is expected here:
+The goblint executable path is passed via the command line, default value is:
 
     ../analyzer/goblint
-or change it in Model.upload_analysis (in src/model.opa)
+Change it in Makefile if necessary.
