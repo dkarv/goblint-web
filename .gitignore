@@ -3,6 +3,7 @@ cfg.dot
 error.log
 result.xml
 .idea
+.idea/*
 _build
 _tracks
 goblintserver.exe
