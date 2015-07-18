@@ -8,6 +8,24 @@ database anas {
 }
 
 module Model {
+  goblint =
+    goblint_parser =
+      {CommandLine.default_parser with
+        names: ["--goblint"],
+        description: "The path to goblint. By default: ../analyzer/goblint",
+        function on_param(x){
+          parser {
+            case y=Rule.consume: {no_params: y}
+          }
+        }
+      }
+      CommandLine.filter(
+      {title: "Goblint Web arguments",
+       // for more arguments: change from string to record
+       init: "../analyzer/goblint",
+       parsers: [goblint_parser],
+       anonymous: []
+      });
 
   function save_analysis(filename, list((string, arg)) args, source) {
     string random = Random.string(8);
@@ -33,12 +51,6 @@ module Model {
   exposed function option(call) get_call(id, line) {
     intmap(call) calls = /anas/all[id == id]/run/calls;
     Map.get(line, calls);
-    /*a = match(r){
-      case {none}: {none}
-      case ~{some}: some.calls[line];
-    };
-    a*/
-    //r.calls[line];
   }
 
   function upload_analysis(callback, list((string, arg)) args, form_data) {

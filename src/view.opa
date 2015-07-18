@@ -47,9 +47,9 @@ module View {
         case ~{val}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
           (s, {val: Dom.get_value(elem)})
-        case ~{str}:
+        case ~{i}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
-          (s, {str: Dom.get_value(elem)})
+          (s, {i: Int.of_string(Dom.get_value(elem))})
         case ~{bln}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
           (s, {bln: Dom.is_checked(elem)})

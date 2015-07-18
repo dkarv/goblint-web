@@ -1,122 +1,66 @@
-type arg = {string val} or {string str} or {bool bln} or
+type arg = {string val} or {int i} or {bool bln} or
   {list(string) opts, int sel} or {list(string) opts, list(int) sels} or
   {list((string,arg)) section}
 
+//type msg = {parse}
+
 module Arguments{
-  function (string,arg) t(string s){
-    (s, {bln: true})
+
+  function list((string, arg)) parse_args(){
+    System.exec(Model.goblint ^ " --writeconf conf.json", "");
+    string content = Binary.to_string(File.read("conf.json"));
+    match(Json.deserialize(content)){
+      case ~{some}:
+        parse_arg(some);
+      case {none}: []
+    }
   }
 
-  function (string,arg) f(string s){
-    (s,{bln: false})
+  recursive function list((string, arg)) parse_arg(RPC.Json.json txt){
+    match(txt){
+      case {Record: ls}:
+        List.map(function((string, RPC.Json.json) (s,elem)){
+          match(elem){
+            case {Bool: t}: (s,{bln: t});
+            case {String: str}: (s,{val: str});
+            case {Int: i}: (s,~{i})
+            case {List: ls}:
+              (s,{val: "[" ^ String.concat(",", List.map(function(elem){
+                match(elem){
+                  case {String: s}: s;
+                  case {Int: i}: String.of_int(i);
+                  default: @fail("unknown list element: {elem}");
+                }
+              },ls)) ^ "]"} );
+            case {Record: r}:
+              (s, {section: parse_arg(elem)});
+            default:
+              @fail("can't parse: {elem}")
+          }
+        },ls);
+      default:
+        @fail("unknown value: {txt}");
+    }
   }
 
-  function (string,arg) st(string s, string v){
-    {(s, {str: v})}
-  }
-
-  function (string,arg) vl(string s, string v){
-    (s, {val: v})
-  }
-
-  function (string,arg) op(string s, list(string) o, int i){
-    (s, {opts: o, sel: i})
-  }
-
-  function (string,arg) ops(string s, list(string) o, list(int) i){
-    (s, {opts: o, sels: i})
-  }
-
-  function (string, arg) sc(string s, list((string, arg)) a){
-    (s, {section: a})
-  }
-
-  // a list of (option name, default value)
-  // TODO generate from goblint defaultconf goblint --writeconf file.json
-  list((string, arg)) args = [
-    st("analyzer","../analyzer/goblint"),
-    vl("includes","[]"),
-    vl("kernel_includes","[]"),
-    vl("custom_includes","[]"),
-    vl("custom_incl",""),
-    f("custom_libc"),
-    f("dopartial"),
-    f("gccwarn"),
-    f("noverify"),
-    vl("mainfun","['main']"),
-    vl("exitfun","[]"),
-    vl("otherfun","[]"),
-    f("allglobs"),
-    f("keepcpp"),
-    t("merge-conflicts"),
-    vl("cppflags",""),
-    f("kernel"),
-    f("dump_globs"),
-    op("solver", ["effectWCon"],0),
-    op("comparesolver", ["effectWCon", " "],1),
-    f("solverdiffs"),
-    f("allfuns"),
-    f("nonstatic"),
-    f("colors"),
-    f("g2html"),
-    sc("interact",[
-      st("out","result"),
-      f("enabled"),
-      f("paused")]),
-    vl("phases","[]"),
-    sc("ana", [
-      ops("activated",["base","escape","mutex"],[0,1,2]),
-      ops("path_sens",["OSEK","OSEK2","mutex","depmutex","malloc_null","uninit"],[0,1,2,3,4,5]),
-      ops("ctx_insens",["OSEK2","stack_loc","stack_trace_set"],[0,1,2]),
-      f("warnings"),
-      sc("cont", [
-        f("localclass"),
-        st("class","")]),
-      sc("osek",[
-        st("oil",""),
-        t("defaults"),
-        st("isrprefix","function_of_"),
-        st("taskprefix","function_of_"),
-        st("isrsuffix",""),
-        st("tasksuffix",""),
-        f("intrpts"),
-        f("check"),
-        vl("names","[]"),
-        f("warnfiles"),
-        vl("safe_vars","[]"),
-        vl("safe_task","[]"),
-        vl("safe_isr","[]"),
-        vl("flags","[]"),
-        t("def_header")]),
-      sc("int",[
-        t("trier"),
-        f("interval"),
-        f("cinterval"),
-        f("cdebug"),
-        op("cwiden",["basic","double"],0),
-        op("cnarrow",["basic","half"],0)]),
-      f("file.optimistic"),
-      st("spec.file",""),
-      sc("arinc",[
-        t("assume_success"),
-        t("simplify"),
-        t("validate"),
-        t("export"),
-        t("debug_pml"),
-        t("merge_globals")]),
-      t("hashcons"),
-      st("restart_count","1")])
-  ];
+  Mutable.t(option(list((string, arg)))) global_arg = Mutable.make({none})
 
   /* arguments necessary for this webinterface. */
   list((string, arg)) fixed = [
-    st("outfile", "result.xml"),
-    st("result", "fast_xml"),
-    t("justcfg")
+    ("outfile", {val: "result.xml"}),
+    ("result", {val: "fast_xml"}),
+    ("justcfg", {bln: true})
   ]
 
   function get_defaults(){
-    args;
+    match(global_arg.get()){
+      case ~{some}:
+        some
+      case {none}:
+        ls = parse_args();
+        global_arg.set({some: ls});
+        ls;
+    }
   }
 
   function get_keys(){
@@ -168,9 +112,9 @@ module Arguments{
               <span></span>
             </label>
           </div>)
-        case {str: s}:
+        case ~{i}:
           nest(Xhtml.update_class("col-xs-7",
-            <input type="text" arg-id={str} value={s} placeholder={s}/> ))
+            <input type="text" arg-id={str} value={String.of_int(i)} placeholder={String.of_int(i)}/> ))
         case {val: s}:
           nest(Xhtml.update_class("col-xs-7",
             <input type="text" arg-id={str} value={s} placeholder={s}/> ))
@@ -197,7 +141,7 @@ module Arguments{
         case ~{section}:
           id = Dom.fresh_id();
           <div arg-id={str} class="panel panel-default">
-            <div class="panel-heading" onclick={showPanel(id,_)} data-toggle={id}>
+            <div class="panel-heading collapsed" onclick={showPanel(id,_)} data-toggle={id}>
               <h4 class="panel-title">
                 <a>
                   {str}
@@ -215,11 +159,7 @@ module Arguments{
 
   function string analyzer_call(list((string, arg)) args){
     Log.debug("Arguments","{args}");
-    string analyzer = match(Option.get(List.assoc("analyzer", args))){
-      case ~{str}: str;
-      default: @fail("nonsense");
-    }
-    args = List.remove(("analyzer", {str: analyzer}), args) ++ fixed;
+    string analyzer = Model.goblint;
 
     string arguments =
       String.concat(" ",
@@ -235,8 +175,21 @@ module Arguments{
     match(a){
       case {bln: {true}}: "--enable " ^ prefix ^ s;
       case {bln: {false}}: "--disable " ^ prefix ^ s;
-      case ~{str}: "--sets " ^ prefix ^ s ^ " " ^ str;
-      case ~{val}: "--set " ^ prefix ^ s ^ " \"" ^ val ^ "\"";
+      case {i: i}: "--set " ^ prefix ^ s ^ " \"" ^ String.of_int(i) ^ "\"";
+      case ~{val}:
+        string value =
+          if(String.is_empty(val)){
+            "'" ^ val ^ "'"
+          }else{
+            if(String.get(0,val) == "["){
+              "[" ^ String.concat(",",
+                List.map(function(s){"'" ^ s ^ "'"},
+                  String.explode(",",
+                    String.substring(1,String.length(val) - 2, val)
+              ))) ^ "]";
+            }else{ "'" ^ val ^ "'" }
+          }
+        "--set " ^ prefix ^ s ^ " \"" ^ value ^ "\"";
       case ~{opts,sels}: "--set " ^ prefix ^ s ^ " \"[" ^ print_opt(opts, sels) ^ "]\"";
       case ~{opts, sel}: "--sets " ^ prefix ^ s ^ " \"'" ^ print_opt(opts, [sel]) ^ "'\"";
       case ~{section}:
