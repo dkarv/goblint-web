@@ -35,14 +35,14 @@ text {
     list-style-type: decimal;
 }
 
-#arguments{
+#arguments {
     min-width: 600px;
     max-height: 600px;
     overflow-y: auto;
     position: absolute;
 }
 
-li.dropdown{
+li.dropdown {
     position: relative;
     display: inline-block;
 }
@@ -53,12 +53,20 @@ li.dropdown{
 
 .panel-heading .panel-title:after {
     /* symbol for "opening" panels */
-    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
-    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
-    float: right;        /* adjust as needed */
-    color: grey;         /* adjust as needed */
+    font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
+    content: "\e114"; /* adjust as needed, taken from bootstrap.css */
+    float: right; /* adjust as needed */
+    color: grey; /* adjust as needed */
 }
+
 .panel-heading.collapsed .panel-title:after {
     /* symbol for "collapsed" panels */
-    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+    content: "\e080";
+}
+
+.lock:after {
+    padding-left: 2px;
+    font-family: 'Glyphicons Halflings';
+    content: "\e033";
+    color: grey;
 }
