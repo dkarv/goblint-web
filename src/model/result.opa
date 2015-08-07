@@ -1,9 +1,6 @@
 // leaf or node
-type elem = {string text, option(string) id} or {string text, option(string) id, list(elem) children}
-type loc = {string file, string fun, int line, string fun2, list(elem) context, list(elem) values}
-
-/*type attributes = {string name, string value}
-type xxml = {string text} or {list(xxml) content, option(string) nstag, list(attributes) attr}*/
+// type elem = {string text, option(string) id} or {string text, option(string) id, list(elem) children}
+// type loc = {string file, string fun, int line, string fun2, list(elem) context, list(elem) values}
 
 type value = {
   stringmap(value) map
@@ -41,7 +38,8 @@ type file = {
 type run = {
   string parameters,
   list(file) files,
-  intmap(call) calls
+  intmap(call) line_calls,
+  stringmap(call) id_calls
 }
 
 module Result{
@@ -263,12 +261,15 @@ module Result{
           intmap(call) cs = List.fold(function(el, cs){
             Map.add(el.line, el, cs);
           }, calls, Map.empty);
+          stringmap(call) cs2 = List.fold(function(el, cs2){
+            Map.add(el.id, el, cs2);
+          }, calls, Map.empty);
           { fs: parse_list(find(r2, "file"), parse_file),
-            cs: cs}
-        default: {fs: [], cs: Map.empty}
+            cs: cs, cs2: cs2}
+        default: {fs: [], cs: Map.empty, cs2: Map.empty}
       }
 
-      {some: {parameters: par, files: fs_cs.fs, calls: fs_cs.cs}}
+      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2}}
     default: {none}
     }
   }

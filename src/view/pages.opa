@@ -97,6 +97,8 @@ module Pages {
       </div>
     case {cfg}:
       <div class="tab-pane" id=#cfg>
+        <div id=#loc-container2>
+        </div>
         <div id=#cfg-container>
           <svg></svg>
         </div>

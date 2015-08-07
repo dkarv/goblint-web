@@ -1,7 +1,7 @@
-type vertex = {string name, string shape, string label}
+type vertex = {string id, string shape, string label}
 type edge = {string start, string end, string label}
-type graph = {list(edge) edges, list(vertex) vertices}
-type ana = { string id, string filename, string src, option(graph) cfg, option(string) dotfile, run run}
+type Model.graph = {list(edge) edges, list(vertex) vertices}
+type ana = { string id, string filename, string src, option(Model.graph) cfg, option(string) dotfile, run run}
 
 database anas {
   ana /all[{id}]
@@ -27,31 +27,42 @@ module Model {
        anonymous: []
       });
 
+  /** this method is called after an upload and goblint has been called already. */
   function save_analysis(filename, list((string, arg)) args, source) {
     string random = Random.string(8);
     /anas/all[{id: random}]/src = source;
     /anas/all[{id: random}]/filename = filename;
-    save_cfg(random);
+    save_cfg(random, filename);
     save_result(random);
     random
   }
 
+  /* do not use often. throws stackoverflows even for quite small analysis'*/
   exposed function get_analysis(id) {
     /anas/all[{id: id}];
   }
 
   exposed function get_src(id){
-    /anas/all[{id: id}]/src
+    /anas/all[{id: id}]/src;
   }
 
   exposed function get_dotfile(id){
-      /anas/all[{id: id}]/dotfile
-    }
+    /anas/all[{id: id}]/dotfile;
+  }
 
-  exposed function option(call) get_call(id, line) {
-    intmap(call) calls = /anas/all[id == id]/run/calls;
+  exposed function get_cfg(id){
+    /anas/all[{id: id}]/cfg;
+  }
+
+  exposed function option(call) get_call_by_line(string id, int line) {
+    intmap(call) calls = /anas/all[id == id]/run/line_calls;
     Map.get(line, calls);
   }
+
+  exposed function option(call) get_call_by_id(string id, string line_id) {
+      stringmap(call) calls = /anas/all[id == id]/run/id_calls;
+      Map.get(line_id, calls);
+    }
 
   function upload_analysis(callback, list((string, arg)) args, form_data) {
     Log.debug("Model","upload");
@@ -66,7 +77,7 @@ module Model {
       // save analysis cfg
       id = save_analysis(val.filename, args, Binary.to_string(val.content));
       callback(id);
-      Log.error("upload","finished upload and analyzing: {id}");
+      Log.debug("upload","finished upload and analyzing: {id}");
     },form_data.uploaded_files);
   }
 
@@ -102,13 +113,19 @@ module Model {
     Log.info("Debug Msg", msg)
   }
 
-  function save_cfg(id){
-    string s = read_file("cfg.dot");
+  function void save_cfg(string id, string filename){
+    string cfg_folder = Uri.encode_string("input/" ^ filename);
+    string s = read_file("cfgs/" ^ cfg_folder ^ "/main.dot");
+    Model.graph g = parse_graph(s);
+    Log.debug("Cfg","{g}");
+    /anas/all[~{id}]/cfg <- some(g);
+    /*string s = read_file("cfg.dot");
     g = parse_graph(s);
     Log.error("parse g","{g}");
     /anas/all[~{id}]/cfg <- some(g)
     /anas/all[~{id}]/dotfile <- some(s)
-    s
+    s*/
+
   }
 
   function read_file(filename) {
@@ -139,10 +156,22 @@ module Model {
       case ws* start=name " -> " end=name ws* "[" label=label "]" ws* ";" ws*:
         {start: start, end: end, label: label }
     }
+
     vertex_parser = parser {
-      case ws* name=name ws* "[shape=" shape=shape "]" ws*: {name: name, label: "", shape: shape}
-      case ws* name=name ws* "[" label=label ",shape=" shape=shape "];" ws*: {name: name, label: label, shape: shape}
+      // first two cases are for the cfgout output, can be removed
+      // case 1 cfgout
+      case ws* name=name ws* "[shape=" shape=shape "]" ws*: {id: name, label: "", shape: shape}
+      // case 2 cfgout
+      case ws* name=name ws* "[" label=label ",shape=" shape=shape "];" ws*: {id: name, label: label, shape: shape}
+      case ws* n=name ws* "[id=\"" id=name
+        "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,];" ws*:
+        {id: n, label: "", shape: "box"}
+      case ws* n=name ws* "[id=\"" id=name
+        "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,"
+        label=label ",shape=" shape=shape "];" ws*:
+        {id: n, label: label, shape: shape}
     }
+
     graph_parser = parser {
       case "digraph cfg \{"
         edges=edge_parser*
