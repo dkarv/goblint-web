@@ -3,29 +3,42 @@ type edge = {string start, string end, string label}
 type Model.graph = {list(edge) edges, list(vertex) vertices}
 type ana = { string id, string filename, string src, option(Model.graph) cfg, option(string) dotfile, run run}
 
+type parameters = {string goblint, bool localmode}
+
 database anas {
   ana /all[{id}]
 }
 
 module Model {
-  goblint =
-    goblint_parser =
-      {CommandLine.default_parser with
+  parameters defaults = {goblint: "../analyzer/goblint", localmode: false};
+
+  private CommandLine.family(parameters) par_family = {
+    title: "Goblint Web parameters",
+    init: defaults,
+    anonymous: [],
+    parsers: [
+      { CommandLine.default_parser with
         names: ["--goblint"],
-        description: "The path to goblint. By default: ../analyzer/goblint",
-        function on_param(x){
-          parser {
-            case y=Rule.consume: {no_params: y}
-          }
+        description: "The path to goblint. Default: {defaults.goblint}",
+        param_doc: "<string>",
+        on_param: function(state) {
+          parser { case y=Rule.consume: {no_params: {state with goblint: y}} }
+        }
+      },
+      { CommandLine.default_parser with
+        names: ["--localmode"],
+        description: "show a local file explorer if enabled. Default: {defaults.localmode}",
+        param_doc: "<bool>",
+        on_param: function(state) {
+          parser { case y=Rule.bool: {no_params: {state with localmode: y}}}
         }
       }
-      CommandLine.filter(
-      {title: "Goblint Web arguments",
-       // for more arguments: change from string to record
-       init: "../analyzer/goblint",
-       parsers: [goblint_parser],
-       anonymous: []
-      });
+    ]
+  }
+
+  parameters arg = CommandLine.filter(par_family);
+  goblint = arg.goblint;
+
 
   /** this method is called after an upload and goblint has been called already. */
   function save_analysis(filename, list((string, arg)) args, source) {
@@ -119,13 +132,6 @@ module Model {
     Model.graph g = parse_graph(s);
     Log.debug("Cfg","{g}");
     /anas/all[~{id}]/cfg <- some(g);
-    /*string s = read_file("cfg.dot");
-    g = parse_graph(s);
-    Log.error("parse g","{g}");
-    /anas/all[~{id}]/cfg <- some(g)
-    /anas/all[~{id}]/dotfile <- some(s)
-    s*/
-
   }
 
   function read_file(filename) {
@@ -154,7 +160,7 @@ module Model {
 
     edge_parser = parser {
       case ws* start=name " -> " end=name ws* "[" label=label "]" ws* ";" ws*:
-        {start: start, end: end, label: label }
+        {start: start, end: end, label: String.strip(label) }
     }
 
     vertex_parser = parser {

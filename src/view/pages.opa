@@ -100,7 +100,10 @@ module Pages {
         <div id=#loc-container2>
         </div>
         <div id=#cfg-container>
-          <svg></svg>
+          <input type="text" class="form-control"
+            id=#search_cfg onchange={Cfg.search_change}
+            placeholder="regex search for edges"/>
+          <svg><g></g></svg>
         </div>
       </div>
     }

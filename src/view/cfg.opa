@@ -5,20 +5,10 @@ module Cfg{
       case {none}:
         Log.error("cfg", "analysis not finished yet");
       case {some: id}:
-        /*match(Model.get_dotfile(id)){
-          case {none}:
-            Log.error("cfg", "no cfg found");
-          case {some: dot}:
-            Log.debug("view", "{dot}");
-            Tab.show(#cfg-tab);
-            render_graph(String.replace("box","rect",dot));
-            %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
-        }*/
         match(Model.get_cfg(id)){
           case {none}:
             Log.error("Cfg","No cfg found");
           case {some: g}:
-            Log.debug("Cfg","graph: {g}");
             Tab.show(#cfg-tab);
             %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
             %%DotRenderer.draw%%(g, callback);
@@ -32,7 +22,6 @@ module Cfg{
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
         option(call) c = Model.get_call_by_id(id, line);
-        Log.debug("src", "{c}");
         res = match(c){
           case {none}: <h3>No information available</h3>
           case {some: cl}:
@@ -49,5 +38,9 @@ module Cfg{
     }
   }
 
-  render_graph = %%DotRenderer.render%%
+  client function search_change(_){
+    string query = Dom.get_value(#search_cfg);
+    Log.debug("Cfg","search changed to: {query}");
+    %%DotRenderer.search%%(query);
+  }
 }

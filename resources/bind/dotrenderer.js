@@ -1,46 +1,61 @@
 /** @opaType Model.graph */
-/**
- * @opaType list('a)
- */
-/**
- * @register {string -> void}
- * Deprecated
- */
-function render(dot) {
-    console.log(dot);
-    var g = graphlibDot.read(dot);
-    console.log(g);
-
-    var render = new dagreD3.render();
-    // Set up an SVG group so that we can translate the final graph.
-    var svg = d3.select("svg");
-    var svgGroup = svg.append("g");
-
-    // Run the renderer. This is what draws the final graph.
-    render(d3.select("svg g"), g);
-
-    // make the svg big enough
-    // console.log(g.graph().width);
-    // $('svg').width(g.graph().width).height(g.graph().height);
-    var initialScale = 0.75;
-    zoom.translate()
-}
+var g;
+var listener;
 /**
  * @register {Model.graph, (string -> void)-> void}
  */
 function draw(cfg, click) {
-    console.log("tests", cfg);
-    var g = new dagreD3.graphlib.Graph().setGraph({});
+    g = new dagreD3.graphlib.Graph().setGraph({});
     call(cfg.vertices, function (elem) {
         g.setNode(elem.id, {label: elem.label});
     });
     call(cfg.edges, function (edge) {
-        console.log(edge);
         g.setEdge(edge.start, edge.end, {label: edge.label});
     });
+
+    listener = click;
+    render();
+
+    // console.log(g);
+    // setTimeout(testing, 8000);
+}
+
+/**
+ * @register { -> void}
+ */
+function testing() {
+    g.setNode("testing", {label: "blabla"});
+    g.setEdge("1", "testing", {label: "edge"});
+    render();
+}
+
+/**
+ * @register {string -> void}
+ */
+function search(str) {
+    // console.log(g.nodes());
+    // console.log(g.labels());
+
+    var pattern = new RegExp(str);
+    g.nodes().forEach(function (n) {
+        g.setNode(n, { style: "fill: white"})
+    });
+    g.edges().forEach(function (e) {
+        edge = g.edge(e);
+        //console.log(edge);
+        if (edge.label.match(pattern)) {
+            console.log("match!", e.v, e.w);
+            g.setNode(e.v, {style: "fill: green"});
+            g.setNode(e.w, {style: "fill: green"});
+        }
+    });
+    render();
+}
+
+function render() {
     var render = new dagreD3.render();
     var svg = d3.select("svg");
-    var svgGroup = svg.append("g");
+    var svgGroup = svg.select("g");
 
     render(svgGroup, g);
     // $('svg').width(g.graph().width).height(g.graph().height);
@@ -51,8 +66,9 @@ function draw(cfg, click) {
 
     // create a listener
     svgGroup.selectAll("g.node")
-        .on('click', click);
+        .on('click', listener);
 }
+
 /**
  * list('a) -> ('a -> void) -> void
  */
