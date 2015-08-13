@@ -118,20 +118,9 @@ module Model {
   }
 
   exposed function debug_parser(){
-    // str = read_file("test.xml");
-    // xmltest = Xmlns.try_parse(str);
-    // Log.error("Debug Parser", "{xmltest}");
-    // result = Result.parse_xml(str);
-    // Log.error("Debug Parser","{result}");
-    string out = System.exec("xml-json test.xml run","")
-    res = Json.deserialize(out);
-    string msg = match(res){
-      case {none}: "could not parse the result.xml... Please install xml-json: npm install xml-json -g"
-      case ~{some}:
-        result = Result.parse_json(some);
-        "{result}"
-    }
-    Log.info("Debug Msg", msg)
+    str = read_file("main.dot");
+    Model.graph g = parse_graph(str);
+    Log.debug("Cfg","{g}");
   }
 
   function void save_cfg(string id, string file){
@@ -171,25 +160,26 @@ module Model {
         {start: start, end: end, label: String.strip(label) }
     }
 
+    start_vertex = parser {
+      case ws* n=name ws* "[id=\"" id=name
+        "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,":
+        {name: n, id: id};
+    }
+
     vertex_parser = parser {
-      // first two cases are for the cfgout output, can be removed
-      // case 1 cfgout
-      case ws* name=name ws* "[shape=" shape=shape "]" ws*: {id: name, label: "", shape: shape}
-      // case 2 cfgout
-      case ws* name=name ws* "[" label=label ",shape=" shape=shape "];" ws*: {id: name, label: label, shape: shape}
-      case ws* n=name ws* "[id=\"" id=name
-        "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,];" ws*:
-        {id: n, label: "", shape: "box"}
-      case ws* n=name ws* "[id=\"" id=name
-        "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,"
-        label=label ",shape=" shape=shape "];" ws*:
-        {id: n, label: label, shape: shape}
+      case begin=start_vertex "];":
+        {id: begin.id, label: "", shape: "box"};
+      case begin=start_vertex
+        label=label ",shape=" shape=shape "];":
+        {id: begin.id, label: label, shape: shape};
+      case begin=start_vertex "shape=" shape=shape "];":
+        {id: begin.id, label: "", shape: shape};
     }
 
     graph_parser = parser {
       case "digraph cfg \{"
         edges=edge_parser*
-        vertices=vertex_parser*
+        vertices=vertex_parser* ws*
         "\}" ws*: {vertices: vertices, edges: edges}
     }
     Parser.parse( graph_parser,str);

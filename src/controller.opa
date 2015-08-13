@@ -10,6 +10,9 @@ module Controller {
       default:
         View.show_analysis(id, {src});
       }
+    case {path: ["test", "parser"] ...}:
+      Model.debug_parser();
+      View.show_root();
     case {...}: Resource.raw_status({bad_request});
     }
   }
