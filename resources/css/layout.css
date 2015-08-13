@@ -37,7 +37,7 @@ text {
     height: 100%;
 }
 
-#loc-container,#loc-container2 {
+#loc-container, #loc-container2 {
     width: 30%;
     float: left;
 }
@@ -80,5 +80,22 @@ li.dropdown {
     padding-left: 2px;
     font-family: 'Glyphicons Halflings';
     content: "\e033";
+    color: grey;
+}
+
+#file-selector {
+    height: 400px;
+    overflow-y: scroll;
+}
+
+#file-selector > ul {
+    list-style: none;
+}
+
+.glyphicon-folder-open {
+    color: #DAA501;
+}
+
+.glyphicon-file {
     color: grey;
 }

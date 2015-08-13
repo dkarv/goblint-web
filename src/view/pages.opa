@@ -72,13 +72,14 @@ module Pages {
     case {upload}:
       Upload.config default_config = Upload.default_config();
       form_body =
-        <input type="file" name="filename"/>
-        <input type="hidden" name="form_id" value="default"/>
-        <input type="submit" value="Upload"
-          onclick={function(_){
-            Dom.add_class( #cfg-tab-parent, "disabled");
-            Dom.add_class( #src-tab-parent, "disabled");
-          }}/>
+        <div class="btn-group">
+          <input type="file" name="filename" class="btn btn-default"/>
+          <input type="submit" value="Upload" class="btn btn-primary"
+            onclick={function(_){
+              Dom.add_class( #cfg-tab-parent, "disabled");
+              Dom.add_class( #src-tab-parent, "disabled");
+            }}/>
+        </div>
 
       Upload.config my_config = {
         {default_config with form_body: form_body} with process: function(res) {
@@ -86,7 +87,18 @@ module Pages {
         }
       }
       <div class="tab-pane" id="upload">
+        <h4>Upload a file: </h4>
         {Upload.html(my_config)}
+        {
+          if(Model.args.localmode){
+            <>
+              <h4>Select local file:</h4>
+              {LocalFile.html()}
+            </>
+          }else{
+            <></>
+          }
+        }
       </div>
     case {src}:
       <div class="tab-pane" id=#src>

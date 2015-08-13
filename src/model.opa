@@ -1,16 +1,16 @@
 type vertex = {string id, string shape, string label}
 type edge = {string start, string end, string label}
 type Model.graph = {list(edge) edges, list(vertex) vertices}
-type ana = { string id, string filename, string src, option(Model.graph) cfg, option(string) dotfile, run run}
+type ana = { string id, string filename, option(Model.graph) cfg, option(string) dotfile, run run}
 
-type parameters = {string goblint, bool localmode}
+type parameters = {string goblint, bool localmode, string startfolder}
 
 database anas {
   ana /all[{id}]
 }
 
 module Model {
-  parameters defaults = {goblint: "../analyzer/goblint", localmode: false};
+  parameters defaults = {goblint: "../analyzer/goblint", localmode: false, startfolder: "/"};
 
   private CommandLine.family(parameters) par_family = {
     title: "Goblint Web parameters",
@@ -32,20 +32,27 @@ module Model {
         on_param: function(state) {
           parser { case y=Rule.bool: {no_params: {state with localmode: y}}}
         }
+      },
+      { CommandLine.default_parser with
+        names: ["--startfolder"],
+        description: "which folder is shown first if '--localmode true'. directories should end with '/'. Default: {defaults.startfolder}",
+        param_doc: "<string>",
+        on_param: function(state) {
+          parser { case y=Rule.consume: {no_params: {state with startfolder: y}} }
+        }
       }
     ]
   }
 
-  parameters arg = CommandLine.filter(par_family);
-  goblint = arg.goblint;
+  parameters args = CommandLine.filter(par_family);
+  goblint = args.goblint;
 
 
   /** this method is called after an upload and goblint has been called already. */
-  function save_analysis(filename, list((string, arg)) args, source) {
+  function save_analysis(file) {
     string random = Random.string(8);
-    /anas/all[{id: random}]/src = source;
-    /anas/all[{id: random}]/filename = filename;
-    save_cfg(random, filename);
+    /anas/all[{id: random}]/filename = file;
+    save_cfg(random, file);
     save_result(random);
     random
   }
@@ -56,7 +63,7 @@ module Model {
   }
 
   exposed function get_src(id){
-    /anas/all[{id: id}]/src;
+    read_file(/anas/all[{id: id}]/filename);
   }
 
   exposed function get_dotfile(id){
@@ -78,20 +85,21 @@ module Model {
     }
 
   function upload_analysis(callback, list((string, arg)) args, form_data) {
-    Log.debug("Model","upload");
     Map.iter(function(key, val) {
-      Log.debug("Model","test");
       // save the file in a subdirectory TODO add timestamp / any other identification
       string file = "input/" ^ val.filename;
       File.write(file, val.content);
-      // call goblint
-      string out = System.exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
-      Log.info("upload","goblint: {out}");
-      // save analysis cfg
-      id = save_analysis(val.filename, args, Binary.to_string(val.content));
-      callback(id);
-      Log.debug("upload","finished upload and analyzing: {id}");
+      process_file(callback, file, args);
     },form_data.uploaded_files);
+  }
+
+  exposed function process_file(callback, string file, list((string, arg)) args){
+    string out = System.exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
+    Log.info("upload","goblint: {out}");
+    // save analysis, graph, ...
+    id = save_analysis(file);
+    callback(id);
+    Log.debug("upload","finished upload and analyzing: {id}");
   }
 
   function save_result(id){
@@ -126,8 +134,8 @@ module Model {
     Log.info("Debug Msg", msg)
   }
 
-  function void save_cfg(string id, string filename){
-    string cfg_folder = Uri.encode_string("input/" ^ filename);
+  function void save_cfg(string id, string file){
+    string cfg_folder = Uri.encode_string(file);
     string s = read_file("cfgs/" ^ cfg_folder ^ "/main.dot");
     Model.graph g = parse_graph(s);
     Log.debug("Cfg","{g}");
