@@ -1,5 +1,4 @@
 # TODOs
-- Local File Explorer
 - Graph collapse
 - Graph search
-- Auto update after arguments change
+- save arguments goblint was called with, and show them after F5

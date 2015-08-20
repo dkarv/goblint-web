@@ -1,10 +1,11 @@
 module View {
 
-  // TODO choose local file
-  // TODO codemirror -> change file -> rerun goblint
-
   client function get_analysis_id(){
     Dom.get_attribute(#tabs, "ana-id");
+  }
+
+  client function show_spinner(){
+    Log.debug("View","loading...")
   }
 
   client function analysis_finished(id) {
@@ -12,8 +13,9 @@ module View {
     Dom.remove_class(#cfg-tab-parent, "disabled");
     Dom.remove_class(#src-tab-parent, "disabled");
 
-    //Dom.set_attribute_unsafe(link, "href","/analysis/" ^ ana.id)
-    Dom.set_attribute_unsafe(#tabs, "ana-id", id)
+    Dom.set_attribute_unsafe(#tabs, "ana-id", id);
+    Cfg.reload(id);
+    Src.reload(id);
   }
 
   // displays the whole page
@@ -42,7 +44,6 @@ module View {
   client function list((string, arg)) parse_arguments(string prefix, list((string, arg)) defaults){
     List.map(function((s,def)){
       string selector = "[arg-id='" ^ Dom.escape_selector(s) ^ "']";
-      Log.debug("View",selector);
       match(def){
         case ~{val}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);

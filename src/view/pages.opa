@@ -15,7 +15,21 @@ module Pages {
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
           Goblint Arguments <span class="caret"></span>
         </a>
-        <form class="dropdown-menu form-horizontal row" id=#arguments>
+        <form class="dropdown-menu form-horizontal row" id=#arguments onchange={ function(_){
+          dom child = Dom.select_id("upload-tab");
+          dom parent = Dom.select_parent_one(child);
+          isActive = Dom.has_class(parent, "active");
+          if(isActive == {false}){
+            // the user is on the cfg or src tab currently, so do a live update
+            match(View.get_analysis_id()){
+              case {none}:
+                Log.error("Pages","can't do live update because there is no ana id");
+              case {some: id}:
+                View.show_spinner();
+                Model.rerun_analysis(View.analysis_finished, id, View.parse_arguments("",Arguments.get_defaults()));
+            }
+          }
+        }}>
             {Arguments.html(Arguments.get_defaults())}
         </form>
       </li>
@@ -109,7 +123,7 @@ module Pages {
       </div>
     case {cfg}:
       <div class="tab-pane" id=#cfg>
-        <div id=#loc-container2>
+        <div id=#loc2-container>
         </div>
         <div id=#cfg-container>
           <input type="text" class="form-control"

@@ -2,8 +2,6 @@ type arg = {string val} or {int i} or {bool bln} or
   {list(string) opts, int sel} or {list(string) opts, list(int) sels} or
   {list((string,arg)) section}
 
-//type msg = {parse}
-
 module Arguments{
 
   function list((string, arg)) parse_args(){
@@ -26,7 +24,7 @@ module Arguments{
             match(a){
               case {section: other_section}:
                 (s,{section: List.map(replace_fixed(fixed_section,_),other_section)});
-              default: @fail("fixed argument is section {fixed_section}, but the other one not {a}");
+              default: @fail("fixed argument is section {fixed_section}, but the other one not: {a}");
             }
           default: (s2, a2);
         }
@@ -207,7 +205,6 @@ module Arguments{
     string arguments =
       String.concat(" ",
         List.map(print_arg("",_),args));
-          //List.map(function((s,a)){([s],a)},args)));
 
     Log.debug("Arguments",arguments);
 

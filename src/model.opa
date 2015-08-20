@@ -84,6 +84,7 @@ module Model {
       Map.get(line_id, calls);
     }
 
+  /** 1. option to trigger an analysis: upload a file */
   function upload_analysis(callback, list((string, arg)) args, form_data) {
     Map.iter(function(key, val) {
       // save the file in a subdirectory TODO add timestamp / any other identification
@@ -92,7 +93,7 @@ module Model {
       process_file(callback, file, args);
     },form_data.uploaded_files);
   }
-
+  /** 2. option to trigger an analysis: pass a local file path */
   exposed function process_file(callback, string file, list((string, arg)) args){
     string out = System.exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
     Log.info("upload","goblint: {out}");
@@ -100,6 +101,12 @@ module Model {
     id = save_analysis(file);
     callback(id);
     Log.debug("upload","finished upload and analyzing: {id}");
+  }
+  /** 3. option to trigger an analysis: tell to rerun an analysis (maybe with another configuration) */
+  exposed function rerun_analysis(callback, string id, list((string, arg)) args){
+    string filepath = /anas/all[{id: id}]/filename;
+    process_file(callback, filepath, args);
+    Log.debug("Model","rerun of analysis ready");
   }
 
   function save_result(id){
