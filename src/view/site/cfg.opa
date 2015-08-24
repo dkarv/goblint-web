@@ -1,7 +1,7 @@
 module Cfg{
 
   client function show(){
-    match(View.get_analysis_id()){
+    match(Site.get_analysis_id()){
       case {none}:
         Log.error("cfg", "analysis not finished yet");
       case {some: id}:
@@ -39,7 +39,7 @@ module Cfg{
   }
 
   client function callback(line_id){
-    match(View.get_analysis_id()){
+    match(Site.get_analysis_id()){
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:

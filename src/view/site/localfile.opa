@@ -3,7 +3,7 @@ type f = {string file} or {string dir}
 module LocalFile {
   function html(){
     <div id=#file-selector onready={function(_){
-        display(Model.args.startfolder);
+        display(Cmd.startfolder());
       }
     }>
       <p>Test123</p>
@@ -11,7 +11,7 @@ module LocalFile {
   }
 
   client function display(string path){
-    ls = list(path);
+    ls = FileUtils.ls(path);
     Dom.remove_content(#file-selector);
     htm = List.fold(function(elem, acc){
       e = match(elem){
@@ -19,7 +19,7 @@ module LocalFile {
           <tr onclick={
             function(_){
               Log.debug("LocalFile","selected: {path ^ f}");
-              Model.process_file(View.analysis_finished, path ^ f, View.parse_arguments("",Arguments.get_defaults()));
+              Model.process_file(Site.analysis_finished, path ^ f, ViewArguments.to_arguments("",ViewArguments.get_defaults()));
             }
           }>
             <td>
@@ -97,48 +97,5 @@ module LocalFile {
         </tbody>
       </table>));
     Log.debug("LocalFile","ready");
-  }
-
-  exposed function list(string path){
-    int n = String.length(path);
-    path = if(String.char_at(path, n-1) != 47 && File.is_directory(path)){
-      // paths should end with '/' = 47 always
-      path ^ "/";
-    }else{ path }
-    List.sort_with(function(a, b){
-        match(a){
-          case {dir: d1}:
-            match(b){
-              case {dir: d2}:
-                String.ordering(d2, d1);
-              case {file: f2}:
-                {gt};
-            }
-          case {file: f1}:
-            match(b){
-              case {dir: d2}:
-                {lt};
-              case {file: f2}:
-                String.ordering(f2, f1);
-            }
-        }
-      },match(File.readdir(path)){
-        case {success: ls}:
-          LowLevelArray.filter_map_to_list(function(elem){
-            //if(String.char_at(elem, 0) == 46){
-            //  {none}
-            //}else{
-              {some:
-                if(File.is_directory(path ^ elem)){
-                  {dir: elem}
-                }else{
-                  {file: elem}
-                }
-              }
-            //}
-          }, ls);
-        case {failure: err}:
-          []
-      });
   }
 }

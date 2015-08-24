@@ -21,16 +21,18 @@ module Pages {
           isActive = Dom.has_class(parent, "active");
           if(isActive == {false}){
             // the user is on the cfg or src tab currently, so do a live update
-            match(View.get_analysis_id()){
+            match(Site.get_analysis_id()){
               case {none}:
                 Log.error("Pages","can't do live update because there is no ana id");
               case {some: id}:
-                View.show_spinner();
-                Model.rerun_analysis(View.analysis_finished, id, View.parse_arguments("",Arguments.get_defaults()));
+                Site.show_spinner();
+                Model.rerun_analysis(
+                  Site.analysis_finished, id,
+                  ViewArguments.to_arguments("",ViewArguments.get_defaults()));
             }
           }
         }}>
-            {Arguments.html(Arguments.get_defaults())}
+            {ViewArguments.to_html(ViewArguments.get_defaults())}
         </form>
       </li>
     </ul>
@@ -97,14 +99,14 @@ module Pages {
 
       Upload.config my_config = {
         {default_config with form_body: form_body} with process: function(res) {
-          Model.upload_analysis(View.analysis_finished,View.parse_arguments("",Arguments.get_defaults()),res);
+          Model.upload_analysis(Site.analysis_finished,ViewArguments.to_arguments("",ViewArguments.get_defaults()),res);
         }
       }
       <div class="tab-pane" id="upload">
         <h4>Upload a file: </h4>
         {Upload.html(my_config)}
         {
-          if(Model.args.localmode){
+          if(Cmd.localmode()){
             <>
               <h4>Select local file:</h4>
               {LocalFile.html()}

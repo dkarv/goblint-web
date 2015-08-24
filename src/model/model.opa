@@ -3,50 +3,11 @@ type edge = {string start, string end, string label}
 type Model.graph = {list(edge) edges, list(vertex) vertices}
 type ana = { string id, string filename, option(Model.graph) cfg, option(string) dotfile, run run}
 
-type parameters = {string goblint, bool localmode, string startfolder}
-
 database anas {
   ana /all[{id}]
 }
 
 module Model {
-  parameters defaults = {goblint: "../analyzer/goblint", localmode: false, startfolder: "/"};
-
-  private CommandLine.family(parameters) par_family = {
-    title: "Goblint Web parameters",
-    init: defaults,
-    anonymous: [],
-    parsers: [
-      { CommandLine.default_parser with
-        names: ["--goblint"],
-        description: "The path to goblint. Default: {defaults.goblint}",
-        param_doc: "<string>",
-        on_param: function(state) {
-          parser { case y=Rule.consume: {no_params: {state with goblint: y}} }
-        }
-      },
-      { CommandLine.default_parser with
-        names: ["--localmode"],
-        description: "show a local file explorer if enabled. Default: {defaults.localmode}",
-        param_doc: "<bool>",
-        on_param: function(state) {
-          parser { case y=Rule.bool: {no_params: {state with localmode: y}}}
-        }
-      },
-      { CommandLine.default_parser with
-        names: ["--startfolder"],
-        description: "which folder is shown first if '--localmode true'. directories should end with '/'. Default: {defaults.startfolder}",
-        param_doc: "<string>",
-        on_param: function(state) {
-          parser { case y=Rule.consume: {no_params: {state with startfolder: y}} }
-        }
-      }
-    ]
-  }
-
-  parameters args = CommandLine.filter(par_family);
-  goblint = args.goblint;
-
 
   /** this method is called after an upload and goblint has been called already. */
   function save_analysis(file) {
@@ -63,7 +24,7 @@ module Model {
   }
 
   exposed function get_src(id){
-    read_file(/anas/all[{id: id}]/filename);
+    FileUtils.read(/anas/all[{id: id}]/filename);
   }
 
   exposed function get_dotfile(id){
@@ -89,7 +50,7 @@ module Model {
     Map.iter(function(key, val) {
       // save the file in a subdirectory TODO add timestamp / any other identification
       string file = "input/" ^ val.filename;
-      File.write(file, val.content);
+      FileUtils.write(file, val.content);
       process_file(callback, file, args);
     },form_data.uploaded_files);
   }
@@ -112,11 +73,12 @@ module Model {
   function save_result(id){
     // xml -> json
     string out = System.exec("xml-json result.xml run", "");
+    Log.debug("Model","xml to json converter: " ^ out);
     // json -> object
     option(RPC.Json.json) res = Json.deserialize(out);
     option(run) result = match(res){
       case {none}: @fail("could not parse result.xml... Please install xml-json: npm install xml-json -g");
-      case ~{some}: Result.parse_json(some);
+      case ~{some}: ResultParser.parse_json(some);
     }
     match(result){
       case {none}: @fail("Can not parse json");
@@ -125,22 +87,20 @@ module Model {
   }
 
   exposed function debug_parser(){
-    str = read_file("main.dot");
+    str = FileUtils.read("main.dot");
     Model.graph g = parse_graph(str);
     Log.debug("Cfg","{g}");
   }
 
   function void save_cfg(string id, string file){
     string cfg_folder = Uri.encode_string(file);
-    string s = read_file("cfgs/" ^ cfg_folder ^ "/main.dot");
+    string s = FileUtils.read("cfgs/" ^ cfg_folder ^ "/main.dot");
     Model.graph g = parse_graph(s);
     Log.debug("Cfg","{g}");
     /anas/all[~{id}]/cfg <- some(g);
   }
 
-  function read_file(filename) {
-    Binary.to_string(File.read(filename));
-  }
+
 
   // parser for dot syntax. produces a graph
   function parse_graph(str){

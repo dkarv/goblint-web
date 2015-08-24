@@ -1,7 +1,7 @@
 module Controller {
   function start(url) {
     match (url) {
-    // show Upload page + TODO last analysis
+    // show Upload page + TODO last n analysis'
     case {path:[] ...}: View.show_root();
     case {path: ["ana", id, t] ...}:
       match(t){

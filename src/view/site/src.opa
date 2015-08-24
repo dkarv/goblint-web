@@ -1,7 +1,7 @@
 module Src{
 
   client function show(){
-    match(View.get_analysis_id()){
+    match(Site.get_analysis_id()){
     case {none}:
       Log.error("src", "analysis not finished yet");
     case {some: id}:
@@ -41,7 +41,7 @@ module Src{
   }
 
   client function callback(line){
-    match(View.get_analysis_id()){
+    match(Site.get_analysis_id()){
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
