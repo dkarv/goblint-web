@@ -9,3 +9,5 @@ _tracks
 goblintserver.exe
 opa-debug
 input
+conf.json
+package.json
