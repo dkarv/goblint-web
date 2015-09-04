@@ -19,6 +19,7 @@ module LocalFile {
           <tr onclick={
             function(_){
               Log.debug("LocalFile","selected: {path ^ f}");
+              Site.show_spinner();
               Model.process_file(Site.analysis_finished, path ^ f, ViewArguments.to_arguments("",ViewArguments.get_defaults()));
             }
           }>

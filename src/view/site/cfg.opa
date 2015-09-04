@@ -67,7 +67,17 @@ module Cfg{
 
   client function search_change(_){
     string query = Dom.get_value(#search_cfg);
-    Log.debug("Cfg","search changed to: {query}");
-    %%DotRenderer.search%%(query);
+    option(expr) ex = Search.parse(query);
+    /*option(expr) ex = Search.parse(query);
+    match((Site.get_analysis_id(), ex)){
+      case ({some: s}, {some: e}):
+        list(string) results = Search.search(s, e);
+        Log.debug("Cfg","{ex}");
+        Log.debug("Cfg","{results}");
+        %%DotRenderer.highlight%%(results);
+      default:
+        Log.error("Cfg","no search possible without finished analysis");
+    }*/
+    Log.debug("Cfg","finished search");
   }
 }

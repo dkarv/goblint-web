@@ -1,4 +1,5 @@
 /** @opaType Model.graph */
+/** @opaType list('a) */
 var g;
 var listener;
 /**
@@ -15,31 +16,33 @@ function draw(cfg, click) {
 
     listener = click;
     render();
-
-    // console.log(g);
-    // setTimeout(testing, 8000);
 }
 
 /**
- * @register { -> void}
+ * @register {list(string) -> void}
  */
-function testing() {
-    g.setNode("testing", {label: "blabla"});
-    g.setEdge("1", "testing", {label: "edge"});
+function highlight(highlights) {
+    console.log(highlights);
+    unhighlight();
+    call(highlights, function (elem) {
+        g.setNode(elem, {style: "fill: green"});
+    });
     render();
+}
+
+function unhighlight() {
+    g.nodes().forEach(function (n) {
+        g.setNode(n, {style: "fill: white"})
+    });
 }
 
 /**
  * @register {string -> void}
  */
 function search(str) {
-    // console.log(g.nodes());
-    // console.log(g.labels());
+    unhighlight();
 
     var pattern = new RegExp(str);
-    g.nodes().forEach(function (n) {
-        g.setNode(n, { style: "fill: white"})
-    });
     g.edges().forEach(function (e) {
         edge = g.edge(e);
         //console.log(edge);

@@ -1,7 +1,3 @@
-// leaf or node
-// type elem = {string text, option(string) id} or {string text, option(string) id, list(elem) children}
-// type loc = {string file, string fun, int line, string fun2, list(elem) context, list(elem) values}
-
 type value = {
   stringmap(value) map
 } or {

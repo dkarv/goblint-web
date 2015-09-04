@@ -4,6 +4,7 @@ module Pages {
 
   // returns the html for the nav tabs
   function menu(tab active, list(tab) display, list(tab) disabled){
+    <>
     <ul class="nav nav-tabs">
       { List.map(function(el){
           list(string) classes = if(el == active){ ["active"] } else {[]};
@@ -36,19 +37,26 @@ module Pages {
         </form>
       </li>
     </ul>
+    <div id=message class="alert" style="display: none">
+      <a class="close" onclick= {function(_){
+        Dom.set_style_property_unsafe(#message, "display", "none");}}
+      >&times;</a>
+      <div id=message-content></div>
+    </div>
+    </>
   }
 
   function tabs(tab active, list(tab) display){
-    <div class="tab-content" id=#tabs>
-      { List.map(function(el){
-          if (el == active){
-            Xhtml.update_class("active",produce_tab(el))
-          }else{
-            produce_tab(el)
-          }
-        }, display)
-      }
-    </div>
+      <div class="tab-content" id=#tabs>
+        { List.map(function(el){
+            if (el == active){
+              Xhtml.update_class("active",produce_tab(el))
+            }else{
+              produce_tab(el)
+            }
+          }, display)
+        }
+      </div>
   }
 
   function produce_menu(tab t){
@@ -56,7 +64,10 @@ module Pages {
     case {upload}:
       <li data-target="#upload">
         <a id=#upload-tab data-target="#upload"
-          onclick={function (_) Tab.show(#upload-tab)}>Upload</a>
+          onclick={function (_){
+            Tab.show(#upload-tab);
+            %%Util.pushState%%("/");
+          }}>Upload</a>
       </li>
     case {cfg}:
       <li id=#cfg-tab-parent>

@@ -10,7 +10,7 @@ module View {
     Resource.page("Goblint | Upload", html);
   }
 
-  /** display the page but make tab t visible */
+  /** display the page and make tab t visible */
   function show_analysis(id, tab t){
     html =
     <>

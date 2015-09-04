@@ -3,20 +3,12 @@ type edge = {string start, string end, string label}
 type Model.graph = {list(edge) edges, list(vertex) vertices}
 type ana = { string id, string filename, option(Model.graph) cfg, option(string) dotfile, run run}
 
+type either('a, 'b) = {'a this} or {'b that}
 database anas {
   ana /all[{id}]
 }
 
 module Model {
-
-  /** this method is called after an upload and goblint has been called already. */
-  function save_analysis(file) {
-    string random = Random.string(8);
-    /anas/all[{id: random}]/filename = file;
-    save_cfg(random, file);
-    save_result(random);
-    random
-  }
 
   /* do not use often. throws stackoverflows even for quite small analysis'*/
   exposed function get_analysis(id) {
@@ -41,9 +33,28 @@ module Model {
   }
 
   exposed function option(call) get_call_by_id(string id, string line_id) {
-      stringmap(call) calls = /anas/all[id == id]/run/id_calls;
-      Map.get(line_id, calls);
+    stringmap(call) calls = /anas/all[id == id]/run/id_calls;
+    Map.get(line_id, calls);
+  }
+
+  /** this method is called after an upload and goblint has been called already. */
+  private function (string, option(string)) save_analysis(file) {
+    string random = Random.string(8);
+    /anas/all[{id: random}]/filename = file;
+    message = match(save_cfg(random, file)){
+      case {some: s} as r: r
+      case {none}:
+        match(save_result(random)){
+          case {some: s}: {some: s}
+          case {none}: {none};
+        }
     }
+    (random, message)
+  }
+
+  function stringmap(call) get_id_map(string id){
+    /anas/all[id == id]/run/id_calls;
+  }
 
   /** 1. option to trigger an analysis: upload a file */
   function upload_analysis(callback, list((string, arg)) args, form_data) {
@@ -56,11 +67,11 @@ module Model {
   }
   /** 2. option to trigger an analysis: pass a local file path */
   exposed function process_file(callback, string file, list((string, arg)) args){
-    string out = System.exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
-    Log.info("upload","goblint: {out}");
+    out = System.shell_exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
+    Log.info("upload","goblint: {out.result()}");
     // save analysis, graph, ...
-    id = save_analysis(file);
-    callback(id);
+    (id, message) = save_analysis(file);
+    callback(id, out.result().stdout, message);
     Log.debug("upload","finished upload and analyzing: {id}");
   }
   /** 3. option to trigger an analysis: tell to rerun an analysis (maybe with another configuration) */
@@ -70,85 +81,96 @@ module Model {
     Log.debug("Model","rerun of analysis ready");
   }
 
-  function save_result(id){
+  /** returns an error message if there was an error. */
+  private function option(string) save_result(id){
     // xml -> json
     string out = System.exec("xml-json result.xml run", "");
-    Log.debug("Model","xml to json converter: " ^ out);
     // json -> object
     option(RPC.Json.json) res = Json.deserialize(out);
-    option(run) result = match(res){
-      case {none}: @fail("could not parse result.xml... Please install xml-json: npm install xml-json -g");
-      case ~{some}: ResultParser.parse_json(some);
+    either(option(run), string) result = match(res){
+      case {none}:
+        {that: "parse error. maybe xml-json is not installed (globally)?"}
+      case ~{some}:
+        {this: ResultParser.parse_json(some)}
     }
     match(result){
-      case {none}: @fail("Can not parse json");
-      case ~{some}: /anas/all[~{id}]/run <- some; Log.info("Model", "save run to database");
+      case {this: {some: s}}:
+        /anas/all[~{id}]/run <- s;
+        // no error message
+        {none}
+      case {that: s}: {some: s}
+      default: {some: "error while doing ResultParser.parse_json()"}
     }
   }
 
   exposed function debug_parser(){
     str = FileUtils.read("main.dot");
-    Model.graph g = parse_graph(str);
+    g = parse_graph(str);
     Log.debug("Cfg","{g}");
   }
 
-  function void save_cfg(string id, string file){
+  /** returns an error message if there was some error */
+  private function option(string) save_cfg(string id, string file){
     string cfg_folder = Uri.encode_string(file);
     string s = FileUtils.read("cfgs/" ^ cfg_folder ^ "/main.dot");
-    Model.graph g = parse_graph(s);
-    Log.debug("Cfg","{g}");
-    /anas/all[~{id}]/cfg <- some(g);
+    option(Model.graph) result = parse_graph(s);
+    match(result){
+      case {some: g}:
+       /anas/all[~{id}]/cfg <- some(g);
+       {none}
+      case {none}:
+        {some: "Error while parsing dot file"}
+    }
   }
 
-
-
   // parser for dot syntax. produces a graph
-  function parse_graph(str){
-    name = parser {
-      case name=(([a-zA-Z0-9])*): Text.to_string(name)
-    }
-    // matches all whitespace, newline, tabs
-    ws = parser {
-      case (" "|"\n"|"\r"|"\t")
-    }
+  private function parse_graph(str){
+    Parser.try_parse( graph_parser,str);
+  }
 
-    label = parser {
-      case "label =" " "? "\""
-        lbl = ((![\"] .)*) ws* "\"": Text.to_string(lbl)
-    }
+  name = parser {
+    case name=(([a-zA-Z0-9])*): Text.to_string(name)
+  }
+  // matches all whitespace, newline, tabs
+  ws = parser {
+    case (" "|"\n"|"\r"|"\t")
+  }
 
-    shape = parser {
-      case b="box" : b
-      case b="diamond" : b
-    }
+  label = parser {
+    case "label =" " "? "\""
+    lbl = ((![\"] .)*) ws* "\"": Text.to_string(lbl)
+  }
 
-    edge_parser = parser {
-      case ws* start=name " -> " end=name ws* "[" label=label "]" ws* ";" ws*:
-        {start: start, end: end, label: String.strip(label) }
-    }
+  shape = parser {
+    case b="box" : b
+    case b="diamond" : b
+  }
 
-    start_vertex = parser {
-      case ws* n=name ws* "[id=\"" id=name
-        "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,":
-        {name: n, id: id};
-    }
+  edge_parser = parser {
+    case ws* start=name " -> " end=name ws* "[" label=label "]" ws* ";" ws*:
+      {start: start, end: end, label: String.strip(label) }
+  }
 
-    vertex_parser = parser {
-      case begin=start_vertex "];":
-        {id: begin.id, label: "", shape: "box"};
-      case begin=start_vertex
-        label=label ",shape=" shape=shape "];":
-        {id: begin.id, label: label, shape: shape};
-      case begin=start_vertex "shape=" shape=shape "];":
-        {id: begin.id, label: "", shape: shape};
-    }
+  start_vertex = parser {
+    case ws* n=name ws* "[id=\"" id=name
+    "\",URL=\"javascript:show_info('\\N');\",fillcolor=white,style=filled,":
+      {name: n, id: id};
+  }
 
-    graph_parser = parser {
-      case "digraph cfg \{"
-        edges=edge_parser*
-        vertices=vertex_parser* ws*
-        "\}" ws*: {vertices: vertices, edges: edges}
-    }
-    Parser.parse( graph_parser,str);
+  vertex_parser = parser {
+    case begin=start_vertex "];":
+      {id: begin.id, label: "", shape: "box"};
+    case begin=start_vertex
+    label=label ",shape=" shape=shape "];":
+      {id: begin.id, label: label, shape: shape};
+    case begin=start_vertex "shape=" shape=shape "];":
+      {id: begin.id, label: "", shape: shape};
+  }
+
+  graph_parser = parser {
+    case "digraph cfg \{"
+    edges=edge_parser*
+    vertices=vertex_parser* ws*
+    "\}" ws*: {vertices: vertices, edges: edges}
   }
 }
