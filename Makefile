@@ -1,6 +1,6 @@
 ########################################
 # USER VARIABLES
-EXE = goblintserver.exe
+EXE = goblintweb.exe
 ifdef SystemRoot
 	RUN_CMD = $(EXE)
 else

@@ -24,7 +24,7 @@ module Search {
         case {e: e, un: {not_}}:
           list(string) res_e = inner(e);
           List.filter(function(el){
-            List.mem(el, res_e);
+            if(List.mem(el, res_e)){{false}}else{{true}};
           }, nodes);
         case {~e1, ~e2, bi: {and_}}:
           list(string) res_e1 = inner(e1);
@@ -86,33 +86,19 @@ module Search {
   }
 
   server function option(expr) parse(string query) {
-    option(expr) res = Parser.try_parse(S, query);
-    Log.debug("Search","{res}");
-    {none}
-    /*recursive expr_p = parser {
-      case var=((![=()] .)*) "=" val=([a-zA-Z0-9]*):
-        {var: Text.to_string(var), value: Text.to_string(val), cmp: {eq_}}
-      case "!" e=expr_p : {e: e, un: {not}}
-      case "(" e=expr_p ")": e
-      case e1=expr_p ("&" e2=expr_p) : {e1: e1, e2: e2, bi: {and_}}
-      case e1=expr_p "|" e2=expr_p : {e1: e1, e2: e2, bi: {or_}}
-
-
-      term = parser {
-        case "(" ~expression ")": expression
-      }
-      expression = parser {
-        case "expr": "expr";
-      }
-      expression
-
-
-    Parser.try_parse(expr_p, query);*/
-    //{none}
+    Parser.try_parse(S, query);
   }
-  /*private function {string var, string value, comp cmp} force_types(){
-     Parser.parse(C, "");
-  }*/
+
+  server function option(list(string)) parse_and_search(string id, string query){
+    match(parse(query)){
+      case {some: res}:
+        Log.debug("Search","parsed expression: {res}");
+        {some: search(id, res)};
+      case {none}:
+        Log.error("Search", "failed parsing {query}");
+        {none}
+    }
+  }
   /**
    * var -> (^[=()&|] .)*
    * C -> var=[0-9]*

@@ -88,10 +88,6 @@ li.dropdown {
     overflow-y: scroll;
 }
 
-#file-selector > ul {
-    list-style: none;
-}
-
 .glyphicon-folder-open {
     color: #DAA501;
 }
