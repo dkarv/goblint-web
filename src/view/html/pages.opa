@@ -26,14 +26,13 @@ module Pages {
               case {none}:
                 Log.error("Pages","can't do live update because there is no ana id");
               case {some: id}:
-                Site.show_spinner();
                 Model.rerun_analysis(
                   Site.analysis_finished, id,
                   ViewArguments.to_arguments("",ViewArguments.get_defaults()));
             }
           }
         }}>
-            {ViewArguments.to_html(ViewArguments.get_defaults())}
+          {ViewArguments.to_html(ViewArguments.get_defaults())}
         </form>
       </li>
     </ul>
@@ -99,13 +98,15 @@ module Pages {
     case {upload}:
       Upload.config default_config = Upload.default_config();
       form_body =
-        <div class="btn-group">
-          <input type="file" name="filename" class="btn btn-default"/>
-          <input type="submit" value="Upload" class="btn btn-primary"
-            onclick={function(_){
-              Dom.add_class( #cfg-tab-parent, "disabled");
-              Dom.add_class( #src-tab-parent, "disabled");
-            }}/>
+        <div class="input-group">
+          <input type="file" name="filename" class="form-control"/>
+          <span class="input-group-btn">
+            <input type="submit" value="Upload" class="btn btn-primary"
+              onclick={function(_){
+                Dom.add_class( #cfg-tab-parent, "disabled");
+                Dom.add_class( #src-tab-parent, "disabled");
+              }}/>
+          </span>
         </div>
 
       Upload.config my_config = {
@@ -130,6 +131,7 @@ module Pages {
     case {src}:
       <div class="tab-pane" id=#src>
         <div id=#loc-container>
+          &nbsp;
         </div>
         <pre class="prettyprint linenums" id=#src-container>
         </pre>
@@ -137,12 +139,63 @@ module Pages {
     case {cfg}:
       <div class="tab-pane" id=#cfg>
         <div id=#loc2-container>
+          &nbsp;
         </div>
         <div id=#cfg-container>
-          <input type="text" class="form-control"
-            id=#search_cfg onchange={Cfg.search_change}
-            placeholder="regex search for edges"/>
-          <svg><g></g></svg>
+          <div class="input-group">
+            <input type="text" class="form-control"
+              id=#search_cfg onchange={Cfg.search_change}
+              placeholder="search for edges"/>
+            <span class="input-group-btn">
+              <div class="btn btn-primary" onclick={function(_){
+                if(Dom.has_class(#search-help, "visible")){
+                  Dom.set_style_property_unsafe(#search-help, "display", "none");
+                  Dom.remove_class(#search-help, "visible");
+                }else{
+                  Dom.set_style_property_unsafe(#search-help, "display", "block");
+                  Dom.add_class(#search-help, "visible");
+                }
+              }}>?</div>
+            </span>
+          </div>
+          <div id=#search-help style="display: none;">
+            <h4>Compare variable x with values:</h4>
+            <table>
+              <tr>
+                <td>x=string</td><td>var x has exact value string</td>
+              </tr>
+              <tr>
+                <td>x=int</td><td>x has exact value int</td>
+              </tr>
+              <tr>
+                <td>x&lt;int</td><td>x smaller than int</td>
+              </tr>
+              <tr>
+                <td>x&gt;int</td><td>x bigger than int</td>
+              </tr>
+              <tr>
+                <td>x[int_1;int_2]</td><td>x &gt;= int_1 and x &lt;=int_2</td>
+              </tr>
+            </table>
+            <h4>Combine the rules above:</h4>
+            <table>
+              <tr>
+                <td>expr_1|expr_2</td><td>expr_1 OR expr_2</td>
+              </tr>
+              <tr>
+                <td>expr_1&expr_2</td><td>expr_1 AND expr_2</td>
+              </tr>
+              <tr>
+                <td>(expr)</td><td>Change the precedence of expressions</td>
+              </tr>
+              <tr>
+                <td>!expr</td><td>Negate the expr</td>
+              </tr>
+            </table>
+          </div>
+          <div id=#cfg-div>
+            <svg class="cfg"><g></g></svg>
+          </div>
         </div>
       </div>
     }

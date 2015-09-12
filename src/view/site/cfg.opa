@@ -55,7 +55,7 @@ module Cfg{
         case {none}: <h3>No information available</h3>
         case {some: cl}:
           <>
-            <h3>{cl.file}:{line_id}</h3>
+            <h3>{line_id}:</h3>
             <h4>Context: </h4>
               {Ana.print_analysis(cl.context)}
             <h4>Path: </h4>
@@ -73,8 +73,11 @@ module Cfg{
           match(ls){
             case {some: ss}:
               %%DotRenderer.highlight%%(ss);
+              Site.hide_message();
+              Dom.set_style_property_unsafe(#search_cfg, "border-color", "#3c763d");
             case {none}:
-              Log.error("Cfg","error parsing your expression");
+              Dom.set_style_property_unsafe(#search_cfg, "border-color","#a94442");
+              Site.show_message("You have a syntax error in your expression", true);
           }
       case {none}:
         Log.error("Cfg","no analysis id found");

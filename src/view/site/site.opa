@@ -3,15 +3,21 @@ module Site {
     Dom.get_attribute(#tabs, "ana-id");
   }
 
-  client function show_spinner(){
-    Dom.set_style_property_unsafe(#message, "display", "block");
-    // TODO
-    Log.debug("View","loading...")
+  client function hide_message(){
+    Dom.set_style_property_unsafe(#message, "display", "none");
   }
 
-  client function hide_spinner(){
-    // TODO remove spinner
-    Log.debug("View","finished loading");
+  client function show_message(string msg, bool error){
+    Dom.set_style_property_unsafe(#message, "display", "block");
+    if(error){
+      Dom.remove_class(#message, "alert-success");
+      Dom.add_class(#message, "alert-danger");
+    }else{
+      Dom.add_class(#message, "alert-success");
+      Dom.remove_class(#message, "alert-danger");
+    }
+
+    Dom.set_html_unsafe(#message-content, msg);
   }
 
   /* is called async from the server after the command to do an analysis has finished. */
@@ -27,15 +33,9 @@ module Site {
         Cfg.reload(id);
         Src.reload(id);
 
-        Dom.add_class(#message, "alert-success");
-        Dom.remove_class(#message, "alert-danger");
-        Dom.set_text(#message-content, message);
+        show_message(message, {false});
       case {some: str}:
-        Dom.remove_class(#message, "alert-success");
-        Dom.add_class(#message, "alert-danger");
-        Dom.set_text(#message-content, message ^ "\n" ^ str);
+        show_message(message ^ "<br/>" ^ str, {true});
     }
-
-    hide_spinner();
   }
 }

@@ -1,9 +1,13 @@
 type unop = {not_}
 type binop = {and_} or {or_}
 type comp = {eq_}
+type icomp = {gt_} or {lt_}
+type vcomp = {in_}
 type expr =
   /** var == value */
   {string var, string val, comp cmp} or
+  {string var, int dec, icomp icmp} or
+  {string var, int d1, int d2, vcomp vcmp} or
   /** this | that */
   {expr e1, expr e2, binop bi} or
   /** !(not)*/
@@ -36,53 +40,80 @@ module Search {
           list(string) res_e1 = inner(e1);
           list(string) res_e2 = inner(e2);
           res_e1 ++ res_e2;
-        case {var: searchVar, val: searchValue, cmp: {eq_}}:
-          Map.To.key_list(
-            Map.filter(function(_, val){
-              List.exists(function(el){
-                if(String.eq("base", el.name)){
-                  // Log.debug("Search","val: {el.val}");
-                  match(el.val){
-                    case ~{map}:
-                      // search for the value domain in the map
-                      match(Map.get("value domain", map)){
-                        case {none}:
-                          {false}
-                        case {some: s}:
-                          // Log.debug("Search","map: {s}");
-                          // ensure s is a map again:
-                          match(s){
-                            case {map: varMap}:
-                              // Log.debug("Search", "varMap: {varMap}");
-                              // now search for the right variable
-                              match(Map.get(searchVar, varMap)){
-                                case {none}:
-                                  {false}
-                                case {some: result}:
-                                  match(result){
-                                    case ~{data}:
-                                      Log.debug("Search","found: {data} == {searchValue}");
-                                      String.eq(data, searchValue);
-                                    default:
-                                      {false}
-                                  }
-                              }
-                            default: {false}
-                          }
-                      }
-                    default:
-                      {false}
-                  }
-                }else{
-                  {false}
-                }
-              },val.path);
-            }, calls)
-          );
+        case {var: searchVar, val: searchValue, ~cmp}:
+          f = match(cmp){
+            case {eq_}: String.eq(searchValue, _)
+          }
+          satisfies(f, searchVar, calls);
+        case {var: searchVar, dec: searchValue, ~icmp}:
+          f = match(icmp){
+            case {gt_}: function(i1){
+              i1 > searchValue
+            }
+            case {lt_}: function(i1){
+              i1 < searchValue
+            }
+          }
+          Log.debug("Search","wtf");
+          satisfies_int(f, searchVar, calls)
+        case {var: searchVar, ~d1, ~d2, vcmp: {in_}}:
+          satisfies_int(function(i){
+            i >= d1 && i <= d2;
+          }, searchVar, calls);
       }
     };
-
     inner(query);
+  }
+
+  private function list(string) satisfies_int((int -> bool) f, string searchVar, stringmap(call) calls){
+    satisfies(function(s){
+      match(Int.of_string_opt(s)){
+        case {none}: false;
+        case {some: i}:
+          f(i)
+      }
+    },searchVar, calls)
+  }
+
+  private function list(string) satisfies((string -> bool) f, string searchVar, stringmap(call) calls){
+    Map.To.key_list(
+      Map.filter(function(_, val){
+        List.exists(function(el){
+          if(String.eq("base", el.name)){
+            match(el.val){
+              case ~{map}:
+                // search for the value domain in the map
+                match(Map.get("value domain", map)){
+                  case {none}:
+                    {false}
+                  case {some: s}:
+                    // ensure s is a map again:
+                    match(s){
+                      case {map: varMap}:
+                        // now search for the right variable
+                        match(Map.get(searchVar, varMap)){
+                          case {none}:
+                            {false}
+                          case {some: result}:
+                            match(result){
+                              case ~{data}:
+                                f(data);
+                              default:
+                                {false}
+                            }
+                        }
+                      default: {false}
+                    }
+                }
+              default:
+                {false}
+            }
+          }else{
+            {false}
+          }
+        },val.path);
+      }, calls)
+    );
   }
 
   server function option(expr) parse(string query) {
@@ -99,6 +130,7 @@ module Search {
         {none}
     }
   }
+
   /**
    * var -> (^[=()&|] .)*
    * C -> var=[0-9]*
@@ -106,14 +138,26 @@ module Search {
    */
   private C =
     var = parser {
-      case v=((![=()&|] .)*): Text.to_string(v);
+      case v=((![=()&|<>\[\]] .)*): Text.to_string(v);
     }
     val = parser {
-      case "\"" v=((!["\""] .)*) "\"": Text.to_string(v);
-      case v=([0-9]+): Text.to_string(v);
+      case v=((![&|()] .)*): Text.to_string(v);
+    }
+    cmp = parser {
+      case "=": {eq_}
+    }
+    icmp = parser {
+      case ">": {gt_}
+      case "<": {lt_}
+    }
+
+    dec = parser {
+      case i=Rule.integer: i;
     }
     parser {
-      case ~var "=" ~val: {~var, ~val, cmp: {eq_}}
+      case ~var "[" i1=dec ";" i2=dec "]": {~var, d1: i1, d2: i2, vcmp: {in_}}
+      case ~var ~cmp ~val: {~var, ~val, ~cmp}
+      case ~var ~icmp ~dec: {~var, ~dec, ~icmp}
       // TODO add more: unlike, bigger, contains, ...
     }
   /**

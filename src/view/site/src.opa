@@ -58,7 +58,7 @@ module Src{
       case {none}: <h3>No information available</h3>
       case {some: cl}:
         <>
-          <h3>{cl.file}:{line}</h3>
+          <h3>Line {line}</h3>
           <h4>Context: </h4>
             {Ana.print_analysis(cl.context)}
           <h4>Path: </h4>
@@ -68,7 +68,6 @@ module Src{
     Dom.put_inside(#loc-container, Dom.of_xhtml(res));
   }
 
-  // Javascript Binding to /resources/bind/dotrenderer.render(string)
   pretty_print = %%Prettify.prettify%%
   register_handler = %%Util.register_line_handler%%
 

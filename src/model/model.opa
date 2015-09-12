@@ -109,6 +109,30 @@ module Model {
     Log.debug("Cfg","{g}");
   }
 
+  private function string decode_html(string str){
+    entity = parser {
+      case "quot": "\""
+      case "amp": "&"
+      case "apos": "\'"
+      case "lt": "<"
+      case "gt": ">"
+    }
+    escape = parser {
+      case "&" e=entity ";": e
+      case "&": "&"
+    }
+    elem = parser {
+      case a=((!["&"] .)*) b=escape: Text.to_string(a) ^ b
+    }
+    p = parser {
+      x=elem* z=((!["&"] .)*):
+        List.fold(function(y, acc){
+          y ^ acc
+        },x, "") ^ Text.to_string(z);
+    }
+    Parser.parse(p, str);
+  }
+
   /** returns an error message if there was some error */
   private function option(string) save_cfg(string id, string file){
     string cfg_folder = Uri.encode_string(file);
@@ -138,7 +162,7 @@ module Model {
 
   label = parser {
     case "label =" " "? "\""
-    lbl = ((![\"] .)*) ws* "\"": Text.to_string(lbl)
+    lbl = ((![\"] .)*) ws* "\"": decode_html(Text.to_string(lbl))
   }
 
   shape = parser {

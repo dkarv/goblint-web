@@ -15,7 +15,7 @@ function draw(cfg, click) {
     });
 
     listener = click;
-    render();
+    render(".cfg");
 }
 
 /**
@@ -27,7 +27,7 @@ function highlight(highlights) {
     call(highlights, function (elem) {
         g.setNode(elem, {style: "fill: green"});
     });
-    render();
+    render(g, ".cfg");
 }
 
 function unhighlight() {
@@ -52,12 +52,12 @@ function search(str) {
             g.setNode(e.w, {style: "fill: green"});
         }
     });
-    render();
+    render(g, ".cfg");
 }
 
-function render() {
+function render(g, target) {
     var render = new dagreD3.render();
-    var svg = d3.select("svg");
+    var svg = d3.select(target);
     var svgGroup = svg.select("g");
 
     render(svgGroup, g);
