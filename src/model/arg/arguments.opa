@@ -92,14 +92,11 @@ module Arguments{
   }
 
   function string analyzer_call(list((string, arg)) args){
-    Log.debug("Arguments","{args}");
     string analyzer = Cmd.args.goblint;
 
     string arguments =
       String.concat(" ",
         List.map(print_arg("",_),args));
-
-    Log.debug("Arguments",arguments);
 
     analyzer ^ " " ^ arguments;
   }

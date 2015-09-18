@@ -126,6 +126,7 @@ li.dropdown {
     border-radius: 5px;
     padding-left: 20px;
     padding-bottom: 20px;
+    z-index: 9;
 }
 
 #search-help > table {

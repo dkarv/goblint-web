@@ -26,16 +26,17 @@ module Site {
 
     match(error){
       case {none}:
+        Dom.set_attribute_unsafe(#tabs, "ana-id", id);
+
         Dom.remove_class(#cfg-tab-parent, "disabled");
         Dom.remove_class(#src-tab-parent, "disabled");
 
-        Dom.set_attribute_unsafe(#tabs, "ana-id", id);
         Cfg.reload(id);
         Src.reload(id);
 
-        show_message(message, {false});
+        show_message(String.replace("\n", "<br/>", message), false);
       case {some: str}:
-        show_message(message ^ "<br/>" ^ str, {true});
+        show_message(message ^ "<br/>" ^ str, true);
     }
   }
 }

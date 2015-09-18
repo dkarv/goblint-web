@@ -34,4 +34,7 @@ default: exe
 run: exe
 	$(RUN_CMD) $(RUN_OPT)
 
+test: exe
+	$(RUN_CMD) $(RUN_OPT) -t 600 --tests true
+
 include Makefile.common

@@ -38,13 +38,13 @@ module Model {
   }
 
   /** this method is called after an upload and goblint has been called already. */
-  private function (string, option(string)) save_analysis(file) {
+  private function (string, option(string)) parse_analysis(file) {
     string random = Random.string(8);
     /anas/all[{id: random}]/filename = file;
-    message = match(save_cfg(random, file)){
+    message = match(parse_cfg(random, file)){
       case {some: s} as r: r
       case {none}:
-        match(save_result(random)){
+        match(parse_result(random)){
           case {some: s}: {some: s}
           case {none}: {none};
         }
@@ -68,21 +68,19 @@ module Model {
   /** 2. option to trigger an analysis: pass a local file path */
   exposed function process_file(callback, string file, list((string, arg)) args){
     out = System.shell_exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
-    Log.info("upload","goblint: {out.result()}");
-    // save analysis, graph, ...
-    (id, message) = save_analysis(file);
-    callback(id, out.result().stdout, message);
-    Log.debug("upload","finished upload and analyzing: {id}");
+    stderr = out.result().stderr;
+    stdout = out.result().stdout;
+    (id, message) = parse_analysis(file);
+    callback(id, stderr ^ "\n" ^ stdout, message);
   }
   /** 3. option to trigger an analysis: tell to rerun an analysis (maybe with another configuration) */
   exposed function rerun_analysis(callback, string id, list((string, arg)) args){
     string filepath = /anas/all[{id: id}]/filename;
     process_file(callback, filepath, args);
-    Log.debug("Model","rerun of analysis ready");
   }
 
   /** returns an error message if there was an error. */
-  private function option(string) save_result(id){
+  private function option(string) parse_result(id){
     // xml -> json
     string out = System.exec("xml-json result.xml run", "");
     // json -> object
@@ -134,16 +132,21 @@ module Model {
   }
 
   /** returns an error message if there was some error */
-  private function option(string) save_cfg(string id, string file){
+  private function option(string) parse_cfg(string id, string file){
     string cfg_folder = Uri.encode_string(file);
-    string s = FileUtils.read("cfgs/" ^ cfg_folder ^ "/main.dot");
-    option(Model.graph) result = parse_graph(s);
-    match(result){
-      case {some: g}:
-       /anas/all[~{id}]/cfg <- some(g);
-       {none}
-      case {none}:
-        {some: "Error while parsing dot file"}
+    string dot_file = "cfgs/" ^ cfg_folder ^ "/main.dot";
+    if(File.exists(dot_file)){
+      string s = FileUtils.read(dot_file);
+      option(Model.graph) result = parse_graph(s);
+      match(result){
+        case {some: g}:
+         /anas/all[~{id}]/cfg <- some(g);
+         {none}
+        case {none}:
+          {some: "Error while parsing dot file"}
+      }
+    }else{
+      {some: "Goblint did not produce a dot file"}
     }
   }
 

@@ -1,7 +1,7 @@
-type parameters = {string goblint, bool localmode, string startfolder}
+type parameters = {string goblint, bool localmode, string startfolder, bool testmode}
 
 module Cmd {
-  parameters defaults = {goblint: "../analyzer/goblint", localmode: false, startfolder: "/"};
+  parameters defaults = {goblint: "../analyzer/goblint", localmode: false, startfolder: "/", testmode: false};
   private CommandLine.family(parameters) par_family = {
     title: "Goblint Web parameters",
     init: defaults,
@@ -30,6 +30,14 @@ module Cmd {
         on_param: function(state) {
           parser { case y=Rule.consume: {no_params: {state with startfolder: y}} }
         }
+      },
+      { CommandLine.default_parser with
+        names: ["--tests"],
+        description: "run the unit tests and exit afterwards",
+        param_doc: "<bool>",
+        on_param: function(state) {
+          parser { case y=Rule.bool: {no_params: {state with testmode: y}}}
+        }
       }
     ]
   }
@@ -42,6 +50,10 @@ module Cmd {
 
   function bool localmode(){
     args.localmode;
+  }
+
+  function bool testmode(){
+    args.testmode;
   }
 
 }
