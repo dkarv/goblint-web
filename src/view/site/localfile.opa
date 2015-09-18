@@ -40,7 +40,7 @@ module LocalFile {
         {acc}
       </>
     },ls,<></>);
-    Dom.put_inside(#file-selector, Dom.of_xhtml(
+    _ = Dom.put_inside(#file-selector, Dom.of_xhtml(
       <table class="table table-hover">
         <thead>
           <tr>
@@ -76,9 +76,9 @@ module LocalFile {
                     inside = Dom.select_next_one(inside);
                     text = Dom.get_text(inside);
                     if(String.contains(text, search)){
-                      Dom.transition(a, Dom.Effect.show());
+                      Dom.show(a);
                     }else{
-                      Dom.transition(a, Dom.Effect.hide());
+                      Dom.hide(a);
                     }
                     Log.debug("LocalFile","search finished");
                   },res);
@@ -96,6 +96,6 @@ module LocalFile {
           {htm}
         </tbody>
       </table>));
-    Log.debug("LocalFile","ready");
+    void
   }
 }

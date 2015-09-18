@@ -14,7 +14,7 @@ module ViewArguments{
     xhtml label =
       <label class="control-label col-xs-4" for={str}> {str}</label>
     bool disabled =
-      List.exists(function((s,a)){ s == str }, fixed);
+      List.exists(function((s,_)){ s == str }, fixed);
     label = if(disabled){
       Xhtml.update_class("lock", label);
     }else{
@@ -81,8 +81,8 @@ module ViewArguments{
       case ~{section}:
         id = Dom.fresh_id();
         list((string, arg)) new_fixed =
-          match(List.find(function((s, a)){str == s}, fixed)){
-            case {some: (s, {section: b})}: b;
+          match(List.find(function((s, _)){str == s}, fixed)){
+            case {some: (_, {section: b})}: b;
             default: [];
           };
         <div arg-id={str} class="panel panel-default">
@@ -122,16 +122,16 @@ module ViewArguments{
     List.map(function((s,def)){
       string selector = "[arg-id='" ^ Dom.escape_selector(s) ^ "']";
       match(def){
-        case ~{val}:
+        case {val: _}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
           (s, {val: Dom.get_value(elem)})
-        case ~{i}:
+        case {i: _}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
           (s, {i: Int.of_string(Dom.get_value(elem))})
-        case ~{bln}:
+        case {bln: _}:
           elem = Dom.select_raw_unsafe(prefix ^ "input" ^ selector);
           (s, {bln: Dom.is_checked(elem)})
-        case ~{opts, sels}:
+        case {~opts, sels: _}:
           elems = Dom.select_raw_unsafe(prefix ^ "select" ^ selector ^ " option:selected");
           (s, {opts:opts, sels:
             Dom.fold(function(d, l){

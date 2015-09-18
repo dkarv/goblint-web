@@ -20,12 +20,12 @@ module FileUtils {
           match(b){
             case {dir: d2}:
               String.ordering(d2, d1);
-            case {file: f2}:
+            case {file: _}:
               {gt};
             }
         case {file: f1}:
           match(b){
-            case {dir: d2}:
+            case {dir: _}:
               {lt};
             case {file: f2}:
               String.ordering(f2, f1);
@@ -42,7 +42,7 @@ module FileUtils {
             }
           }
         }, ls);
-      case {failure: err}:
+      case {failure: _}:
         []
       });
   }

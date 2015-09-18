@@ -6,6 +6,7 @@ var listener;
  * @register {Model.graph, (string -> void)-> void}
  */
 function draw(cfg, click) {
+    console.log(cfg);
     g = new dagreD3.graphlib.Graph().setGraph({});
     call(cfg.vertices, function (elem) {
         g.setNode(elem.id, {label: elem.label});
@@ -15,7 +16,7 @@ function draw(cfg, click) {
     });
 
     listener = click;
-    render(".cfg");
+    render(g, ".cfg");
 }
 
 /**
@@ -34,25 +35,6 @@ function unhighlight() {
     g.nodes().forEach(function (n) {
         g.setNode(n, {style: "fill: white"})
     });
-}
-
-/**
- * @register {string -> void}
- */
-function search(str) {
-    unhighlight();
-
-    var pattern = new RegExp(str);
-    g.edges().forEach(function (e) {
-        edge = g.edge(e);
-        //console.log(edge);
-        if (edge.label.match(pattern)) {
-            console.log("match!", e.v, e.w);
-            g.setNode(e.v, {style: "fill: green"});
-            g.setNode(e.w, {style: "fill: green"});
-        }
-    });
-    render(g, ".cfg");
 }
 
 function render(g, target) {

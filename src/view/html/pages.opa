@@ -2,6 +2,14 @@ type tab = {upload} or {src} or {cfg}
 
 module Pages {
 
+  function string name(tab t){
+    match(t){
+      case {upload}: "Upload";
+      case {src}: "Source"
+      case {cfg}: "Graph"
+    }
+  }
+
   // returns the html for the nav tabs
   function menu(tab active, list(tab) display, list(tab) disabled){
     <>

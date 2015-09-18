@@ -1,7 +1,7 @@
 /** will be deprecated once goblint offers json output */
 module ResultParser {
   function option(RPC.Json.json) find(list((string, RPC.Json.json)) ls, string str){
-    match(List.find(function ((name, value)) {name == str},ls)){
+    match(List.find(function ((name, _)) {name == str},ls)){
       case {some: (_, val)}: {some: val}
       case {none}: {none}
     }
@@ -88,15 +88,15 @@ module ResultParser {
           default: @fail("can't parse value list");
         }
 
-        values ++ match(find(r,"_")){
+        values = values ++ match(find(r,"_")){
           // sometimes there is a string after the last key
           case {some: {String: s}}: [{data: String.strip(s)}];
           default: [];
         }
 
         {some: {map: Map.From.assoc_list(List.zip(keys, values))}}
-      case {some: {String: s}}:
-        // empty string
+      case {some: {String: _}}:
+        // always an empty string
         {some: {map: Map.empty}}
       case {none}:
         {none}
@@ -107,7 +107,7 @@ module ResultParser {
 
   function option(value) parse_set(list((string, RPC.Json.json)) ls){
     match(find(ls, "set")){
-      case {some: {Record: r}} as children:
+      case {some: {Record: r}}:
         list(value) vals = List.filter_map(function(elem){
           match(elem){
             case ("value", x):
@@ -120,7 +120,7 @@ module ResultParser {
         {some: {set: vals}}
       case {none}:
         {none}
-      case {some: {String: s}}:
+      case {some: {String: _}}:
         {some: {set: []}}
       default:
         @fail("TODO no set? {ls}");

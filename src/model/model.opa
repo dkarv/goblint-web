@@ -29,11 +29,13 @@ module Model {
 
   exposed function option(call) get_call_by_line(string id, int line) {
     intmap(call) calls = /anas/all[id == id]/run/line_calls;
+    // FIXME optimize: use database query instead of Map.get
     Map.get(line, calls);
   }
 
   exposed function option(call) get_call_by_id(string id, string line_id) {
     stringmap(call) calls = /anas/all[id == id]/run/id_calls;
+    // FIXME optimize: use database query instead of Map.get
     Map.get(line_id, calls);
   }
 
@@ -42,7 +44,7 @@ module Model {
     string random = Random.string(8);
     /anas/all[{id: random}]/filename = file;
     message = match(parse_cfg(random, file)){
-      case {some: s} as r: r
+      case {some: _} as r: r
       case {none}:
         match(parse_result(random)){
           case {some: s}: {some: s}
@@ -58,7 +60,7 @@ module Model {
 
   /** 1. option to trigger an analysis: upload a file */
   function upload_analysis(callback, list((string, arg)) args, form_data) {
-    Map.iter(function(key, val) {
+    Map.iter(function(_, val) {
       // save the file in a subdirectory TODO add timestamp / any other identification
       string file = "input/" ^ val.filename;
       FileUtils.write(file, val.content);
@@ -69,9 +71,10 @@ module Model {
   exposed function process_file(callback, string file, list((string, arg)) args){
     out = System.shell_exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
     stderr = out.result().stderr;
+    stderr = stderr ^ if(String.is_empty(stderr)){""}else{"\n"}
     stdout = out.result().stdout;
     (id, message) = parse_analysis(file);
-    callback(id, stderr ^ "\n" ^ stdout, message);
+    callback(id, stderr ^ stdout, message);
   }
   /** 3. option to trigger an analysis: tell to rerun an analysis (maybe with another configuration) */
   exposed function rerun_analysis(callback, string id, list((string, arg)) args){

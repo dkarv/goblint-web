@@ -20,6 +20,6 @@ module View {
         Pages.tabs(t, [{upload}, {src}, {cfg}]))
       }
     </>
-    Resource.page("Goblint | {t}", html);
+    Resource.page("Goblint | " ^ Pages.name(t), html);
   }
 }

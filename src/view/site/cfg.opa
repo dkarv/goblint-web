@@ -50,7 +50,7 @@ module Cfg{
     }
   }
 
-  client function set_information(option(call) c, string line_id){
+  client function void set_information(option(call) c, string line_id){
       res = match(c){
         case {none}: <h3>No information available</h3>
         case {some: cl}:
@@ -62,7 +62,8 @@ module Cfg{
               {Ana.print_analysis(cl.path)}
           </>
       }
-      Dom.put_inside(#loc2-container, Dom.of_xhtml(res));
+      _ = Dom.put_inside(#loc2-container, Dom.of_xhtml(res));
+      void
     }
 
   client function search_change(_){

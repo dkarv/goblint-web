@@ -53,7 +53,7 @@ module Src{
     }
   }
 
-  client function set_information(option(call) c, int line){
+  client function void set_information(option(call) c, int line){
     res = match(c){
       case {none}: <h3>No information available</h3>
       case {some: cl}:
@@ -65,7 +65,8 @@ module Src{
             {Ana.print_analysis(cl.path)}
         </>
     }
-    Dom.put_inside(#loc-container, Dom.of_xhtml(res));
+    _ = Dom.put_inside(#loc-container, Dom.of_xhtml(res));
+    void
   }
 
   pretty_print = %%Prettify.prettify%%

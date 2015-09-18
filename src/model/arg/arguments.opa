@@ -32,11 +32,11 @@ module Arguments{
 
   /** only return the keys of the arguments. */
   function get_keys(){
-    List.map(function((a,b)){a}, get_defaults());
+    List.map(function((a,_)){a}, get_defaults());
   }
 
   function list((string, arg)) parse_args(){
-    System.exec(Cmd.args.goblint ^ " --writeconf conf.json", "");
+    _ = System.exec(Cmd.args.goblint ^ " --writeconf conf.json", "");
     string content = FileUtils.read("conf.json");
     match(Json.deserialize(content)){
       case ~{some}:
@@ -80,7 +80,7 @@ module Arguments{
                   default: @fail("unknown list element: {elem}");
                 }
               },ls)) ^ "]"} );
-            case {Record: r}:
+            case {Record: _}:
               (s, {section: parse_arg(elem)});
             default:
               @fail("can't parse: {elem}")
@@ -131,6 +131,6 @@ module Arguments{
   function string print_opt(list(string) opts, list(int) sels){
       String.concat(",",
         List.map(function(s){"'" ^ s ^ "'" },
-          List.filteri(function(i, s){List.mem(i,sels)},opts)));
+          List.filteri(function(i, _){List.mem(i,sels)},opts)));
   }
 }
