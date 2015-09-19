@@ -13,57 +13,61 @@ module Pages {
   // returns the html for the nav tabs
   function menu(tab active, list(tab) display, list(tab) disabled){
     <>
-    <ul class="nav nav-tabs">
-      { List.map(function(el){
-          list(string) classes = if(el == active){ ["active"] } else {[]};
-          classes = if(List.mem(el, disabled)){ ["disabled" | classes] } else {classes}
-          List.fold(Xhtml.update_class, classes, produce_menu(el))
-        }, display);
-      }
-      <li class="dropdown pull-right">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-          Goblint Arguments <span class="caret"></span>
-        </a>
-        <form class="dropdown-menu form-horizontal row" id=#arguments onchange={ function(_){
-          dom child = Dom.select_id("upload-tab");
-          dom parent = Dom.select_parent_one(child);
-          isActive = Dom.has_class(parent, "active");
-          if(isActive == {false}){
-            // the user is on the cfg or src tab currently, so do a live update
-            match(Site.get_analysis_id()){
-              case {none}:
-                Log.error("Pages","can't do live update because there is no ana id");
-              case {some: id}:
-                Model.rerun_analysis(
-                  Site.analysis_finished, id,
-                  ViewArguments.to_arguments("",ViewArguments.get_defaults()));
+        <div class="header">
+          <ul class="nav nav-tabs">
+            { List.map(function(el){
+              list(string) classes = if(el == active){ ["active"] } else {[]};
+                classes = if(List.mem(el, disabled)){ ["disabled" | classes] } else {classes}
+                List.fold(Xhtml.update_class, classes, produce_menu(el))
+              }, display);
             }
-          }
-        }}>
-          {ViewArguments.to_html(ViewArguments.get_defaults())}
-        </form>
-      </li>
-    </ul>
-    <div id=message class="alert" style="display: none">
-      <a class="close" onclick= {function(_){
-        Dom.set_style_property_unsafe(#message, "display", "none");}}
-      >&times;</a>
-      <div id=message-content></div>
-    </div>
-    </>
+            <li class="dropdown pull-right">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                Goblint Arguments <span class="caret"></span>
+              </a>
+              <form class="dropdown-menu form-horizontal row" id=#arguments onchange={ function(_){
+                dom child = Dom.select_id("upload-tab");
+                dom parent = Dom.select_parent_one(child);
+                isActive = Dom.has_class(parent, "active");
+                if(isActive == {false}){
+                  // the user is on the cfg or src tab currently, so do a live update
+                  match(Site.get_analysis_id()){
+                    case {none}:
+                      Log.error("Pages","can't do live update because there is no ana id");
+                    case {some: id}:
+                      Model.rerun_analysis(
+                        Site.analysis_finished, id,
+                        ViewArguments.to_arguments("",ViewArguments.get_defaults()));
+                  }
+                }
+                }}>
+                {ViewArguments.to_html(ViewArguments.get_defaults())}
+              </form>
+            </li>
+          </ul>
+        </div>
+        <div class="header2">
+         <div class="alert" id=#message style="display: none">
+          <a class="close" onclick= {function(_){
+            Dom.set_style_property_unsafe(#message, "display", "none");}}
+          >&times;</a>
+          <div id=message-content></div>
+        </div>
+      </div>
+      </>
   }
 
   function tabs(tab active, list(tab) display){
-      <div class="tab-content" id=#tabs>
-        { List.map(function(el){
-            if (el == active){
-              Xhtml.update_class("active",produce_tab(el))
-            }else{
-              produce_tab(el)
-            }
-          }, display)
-        }
-      </div>
+    <div class="tab-content" id=#tabs>
+      { List.map(function(el){
+          if (el == active){
+            Xhtml.update_class("active",produce_tab(el))
+          }else{
+            produce_tab(el)
+          }
+        }, display)
+      }
+    </div>
   }
 
   function produce_menu(tab t){
@@ -123,33 +127,38 @@ module Pages {
         }
       }
       <div class="tab-pane" id="upload">
-        <h4>Upload a file: </h4>
-        {Upload.html(my_config)}
-        {
-          if(Cmd.localmode()){
-            <>
-              <h4>Select local file:</h4>
-              {LocalFile.html()}
-            </>
-          }else{
-            <></>
+          <h4>Upload a file: </h4>
+          {Upload.html(my_config)}
+          {
+            if(Cmd.localmode()){
+              <>
+                <h4>Select local file:</h4>
+                {LocalFile.html()}
+              </>
+            }else{
+              <></>
+            }
           }
-        }
       </div>
     case {src}:
-      <div class="tab-pane" id=#src>
-        <div id=#loc-container>
+      <div class="tab-pane box" id=#src>
+        <div id=#loc-container class="left">
           &nbsp;
         </div>
-        <pre class="prettyprint linenums" id=#src-container>
-        </pre>
+        <div class="right">
+          <pre class="prettyprint linenums" id=#src-container></pre>
+        </div>
       </div>
     case {cfg}:
-      <div class="tab-pane" id=#cfg>
-        <div id=#loc2-container>
+      <div class="tab-pane box" id=#cfg>
+        <div id=#loc2-container class="left">
           &nbsp;
         </div>
-        <div id=#cfg-container>
+        <div id=#cfg-container class="right">
+          <!--<select id=#collapse-sel onchange={Cfg.collapse_change}>
+            <option value="none">Don't collapse</option>
+            <option value="one">Simple collapse</option>
+          </select>-->
           <div class="input-group">
             <input type="text" class="form-control"
               id=#search_cfg onchange={Cfg.search_change}
@@ -201,10 +210,8 @@ module Pages {
               </tr>
             </table>
           </div>
-          <div id=#cfg-div>
             <svg class="cfg"><g></g></svg>
           </div>
-        </div>
       </div>
     }
   }

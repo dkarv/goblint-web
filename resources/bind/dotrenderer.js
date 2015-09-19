@@ -15,6 +15,8 @@ function draw(cfg, click) {
         g.setEdge(edge.start, edge.end, {label: edge.label});
     });
 
+    console.log(g);
+
     listener = click;
     render(g, ".cfg");
 }

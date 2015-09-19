@@ -17,56 +17,52 @@ text {
 }
 
 /* site layout related properties */
-.nav.nav-tabs {
-    height: 42px;
+html, body {
+    height: 100%;
+}
+#content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 #tabs {
-    margin-top: 42px;
-}
-
-#tabs, #cfg-div {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
-#cfg-div {
-    margin-top: 34px;
-}
-
-svg.cfg {
-    height: 99%;
-    width: 100%;
-}
-
-.tab-pane {
-    height: 100%;
-}
-
-#cfg-container, #src-container {
-    width: 70%;
-    float: left;
-}
-
-#src-container {
-    height: 100%;
-    margin: 0;
-    overflow-y: auto;
-}
-
-#cfg-container {
-    height: 100%;
+    flex: 1 1 auto;
     position: relative;
 }
 
-#loc-container, #loc2-container {
-    width: 30%;
-    float: left;
-    max-height: 100%;
+.box{
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+}
+
+.left {
+    width: 0;
+    flex: 1 1 auto;
     overflow-y: auto;
+}
+
+.right {
+    width: 0;
+    flex: 3 1 auto;
+    overflow-y: auto;
+}
+
+.box.active {
+    display: flex;
+}
+
+#cfg-container {
+    display: flex;
+    flex-direction: column;
+}
+
+svg.cfg {
+    flex: 1 1 auto;
 }
 
 /* display line number in each line TODO do we want that? */
@@ -136,13 +132,4 @@ li.dropdown {
 
 #search-help td {
     padding-bottom: 5px;
-}
-
-#message {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: 0;
-    z-index: 10;
 }

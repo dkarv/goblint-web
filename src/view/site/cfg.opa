@@ -51,20 +51,25 @@ module Cfg{
   }
 
   client function void set_information(option(call) c, string line_id){
-      res = match(c){
-        case {none}: <h3>No information available</h3>
-        case {some: cl}:
-          <>
-            <h3>{line_id}:</h3>
-            <h4>Context: </h4>
-              {Ana.print_analysis(cl.context)}
-            <h4>Path: </h4>
-              {Ana.print_analysis(cl.path)}
-          </>
-      }
-      _ = Dom.put_inside(#loc2-container, Dom.of_xhtml(res));
-      void
+    res = match(c){
+      case {none}: <h3>No information available</h3>
+      case {some: cl}:
+        <>
+          <h3>{line_id}:</h3>
+          <h4>Context: </h4>
+            {Ana.print_analysis(cl.context)}
+          <h4>Path: </h4>
+            {Ana.print_analysis(cl.path)}
+        </>
     }
+    _ = Dom.put_inside(#loc2-container, Dom.of_xhtml(res));
+    void
+  }
+
+  client function collapse_change(_){
+    val = Dom.get_value(#collapse-sel);
+    Log.debug("Cfg","collapse change: " ^ val);
+  }
 
   client function search_change(_){
     string query = Dom.get_value(#search_cfg);
