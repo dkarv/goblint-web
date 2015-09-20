@@ -9,10 +9,10 @@ function draw(cfg, click) {
     console.log(cfg);
     g = new dagreD3.graphlib.Graph().setGraph({});
     call(cfg.vertices, function (elem) {
-        g.setNode(elem.id, {label: elem.label});
+        g.setNode(elem.id, {});
     });
     call(cfg.edges, function (edge) {
-        g.setEdge(edge.start, edge.end, {label: edge.label});
+        g.setEdge(edge.start, edge.end, {label: edge.label, description: "TEST<br/>TEST123"});
     });
 
     console.log(g);

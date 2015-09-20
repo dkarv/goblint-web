@@ -178,7 +178,7 @@ module Model {
 
   edge_parser = parser {
     case ws* start=name " -> " end=name ws* "[" label=label "]" ws* ";" ws*:
-      {start: start, end: end, label: String.strip(label) }
+      {start: start, end: end, label: String.strip(label)}
   }
 
   start_vertex = parser {

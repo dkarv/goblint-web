@@ -69,6 +69,19 @@ module Cfg{
   client function collapse_change(_){
     val = Dom.get_value(#collapse-sel);
     Log.debug("Cfg","collapse change: " ^ val);
+    match(Site.get_analysis_id()){
+      case {some: id}:
+        option(Model.graph) g = Graph.collapse({one}, id);
+        match(g){
+          case {none}:
+            Log.error("Cfg","There was an error: collapsing not possible");
+          case {some: g}:
+            Log.debug("Cfg","collapsed graph: {g}");
+            %%DotRenderer.draw%%(g, callback);
+        }
+      case {none}:
+        Log.error("Cfg","no analysis id found");
+    }
   }
 
   client function search_change(_){

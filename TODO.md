@@ -1,5 +1,4 @@
 # TODOs
-- bug: graph does not display vertex numbers - only after doing a search
 - Graph collapse
 - save arguments goblint was called with, and show them after F5
 - show global invariants
