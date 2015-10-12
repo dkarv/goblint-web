@@ -39,6 +39,10 @@ module Model {
     /anas/all[id == id]/run/globs;
   }
 
+  exposed function list(warning) get_warnings(string id){
+    /anas/all[id == id]/run/warnings;
+  }
+
   function list(string) get_call_ids(string id){
     /anas/all[id == id]/run/call_ids;
   }
@@ -62,9 +66,7 @@ module Model {
     (random, message)
   }
 
-  //function stringmap(option(call)) get_id_map(string id){
-  //  /anas/all[id == id]/run/id_calls;
-  //}
+
 
   /** 1. option to trigger an analysis: upload a file */
   function upload_analysis(callback, list((string, arg)) args, form_data) {

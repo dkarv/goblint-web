@@ -20,6 +20,7 @@ text {
 html, body {
     height: 100%;
 }
+
 #content {
     display: flex;
     flex-direction: column;
@@ -31,7 +32,7 @@ html, body {
     position: relative;
 }
 
-.box{
+.box {
     position: absolute;
     bottom: 0;
     top: 0;
@@ -132,4 +133,11 @@ li.dropdown {
 
 #search-help td {
     padding-bottom: 5px;
+}
+
+li.warn:before {
+    content: "\e107";
+    font-family: "Glyphicons Halflings";
+    color: red;
+    position: absolute;
 }

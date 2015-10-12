@@ -20,6 +20,17 @@ type call = {
   list(analysis) path
 }
 
+type warnitem = {
+  string file,
+  int line,
+  string txt
+}
+
+type warning = {
+  string group,
+  list(warnitem) items
+}
+
 type fkt = {
   string name,
   list(string) nodes
@@ -37,7 +48,8 @@ type run = {
   intmap(call) line_calls,
   stringmap(call) id_calls,
   list(string) call_ids,
-  list(analysis) globs
+  list(analysis) globs,
+  list(warning) warnings
 }
 
 module Result{

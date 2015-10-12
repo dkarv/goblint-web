@@ -9,9 +9,18 @@ function register_line_handler(type, callback) {
     });
 }
 /**
- * @register { -> void}
+ * @register {int, string, string -> void}
  */
-function test() {
+function add_warning(line, title, text) {
+    var elem = $('ol.linenums').children('li').eq(line);
+    elem.addClass('warn');
+    var oldtitle = elem.attr('title');
+    if(oldtitle && oldtitle !== ''){
+        oldtitle += '\n\n';
+    }else{
+        oldtitle = "";
+    }
+    elem.attr('title', oldtitle + title + '\n' + text);
 
 }
 

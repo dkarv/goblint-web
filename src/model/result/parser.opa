@@ -209,6 +209,39 @@ module ResultParser {
     }, parse_list(find(ls, "analysis"), parse_analysis));
   }
 
+  function warning parse_warning(list((string, RPC.Json.json)) ls){
+    match(find(ls, "group")){
+      case {some: {Record: rs}}:
+        string name = match(find(rs, "name")){
+          case {some: {String: s}}:
+            s
+          default:
+            @fail("can't parse group name");
+        }
+        list(warnitem) items = parse_list(find(rs, "text"), parse_warnitem);
+
+        {group: name, items: items}
+      default:
+        @fail("Can't parse warning group");
+    }
+  }
+
+  function warnitem parse_warnitem(list((string, RPC.Json.json)) ls){
+    string txt = match(find(ls, "_")){
+      case {some: {String: s}}: s
+      default: @fail("can't parse text of text");
+    }
+    string file = match(find(ls, "file")){
+      case {some: {String: s}}: s
+      default: @fail("can't parse file of text");
+    }
+    int line = match(find(ls, "line")){
+      case {some: {String: s}}: Int.of_string(s);
+      default: @fail("can't parse line of text");
+    }
+    ~{line, file, txt}
+  }
+
   /**
    * input has to be sorted in a way that the same analysis are right nest to each other
    */
@@ -256,6 +289,7 @@ module ResultParser {
 
           list(string) call_ids = Map.To.key_list(cs2);
 
+          // #######################
           // parse all glob elements
           list(list((string, analysis))) globs = parse_list(find(r2, "glob"), parse_glob);
 
@@ -271,15 +305,18 @@ module ResultParser {
             stringmap(value) globs = Map.From.assoc_list(gls);
             {~name, val: {map: globs}}
           }, merged_globs);
-          // input: list of list with (variable id, analysis)
-          // first step: sort by analysis: list ((analysis))
 
+          // ##################
+          // parse all warnings
+          list(warning) warnings = parse_list(find(r2, "warning"), parse_warning);
+
+          // return
           { fs: parse_list(find(r2, "file"), parse_file),
-            ~cs, ~cs2, globs: anas, ~call_ids}
+            ~cs, ~cs2, globs: anas, ~call_ids, ~warnings}
         default: @fail("No result tag in the xml file?")
       }
 
-      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2, globs: fs_cs.globs, call_ids: fs_cs.call_ids}}
+      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2, globs: fs_cs.globs, call_ids: fs_cs.call_ids, warnings: fs_cs.warnings}}
     default: @fail("the xml file seems to be broken?")
     }
   }
