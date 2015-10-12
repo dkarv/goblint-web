@@ -249,9 +249,13 @@ module ResultParser {
           intmap(call) cs = List.fold(function(el, cs){
             Map.add(el.line, el, cs);
           }, calls, Map.empty);
+
           stringmap(call) cs2 = List.fold(function(el, cs2){
             Map.add(el.id, el, cs2);
           }, calls, Map.empty);
+
+          list(string) call_ids = Map.To.key_list(cs2);
+
           // parse all glob elements
           list(list((string, analysis))) globs = parse_list(find(r2, "glob"), parse_glob);
 
@@ -271,11 +275,11 @@ module ResultParser {
           // first step: sort by analysis: list ((analysis))
 
           { fs: parse_list(find(r2, "file"), parse_file),
-            cs: cs, cs2: cs2, globs: anas}
+            ~cs, ~cs2, globs: anas, ~call_ids}
         default: @fail("No result tag in the xml file?")
       }
 
-      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2, globs: fs_cs.globs}}
+      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2, globs: fs_cs.globs, call_ids: fs_cs.call_ids}}
     default: @fail("the xml file seems to be broken?")
     }
   }

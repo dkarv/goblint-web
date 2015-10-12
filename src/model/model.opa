@@ -28,19 +28,23 @@ module Model {
   }
 
   exposed function option(call) get_call_by_line(string id, int line) {
-    intmap(call) calls = /anas/all[id == id]/run/line_calls;
-    // FIXME optimize: use database query instead of Map.get
-    Map.get(line, calls);
+    ?/anas/all[id == id]/run/line_calls[line];
   }
 
   exposed function option(call) get_call_by_id(string id, string line_id) {
-    stringmap(call) calls = /anas/all[id == id]/run/id_calls;
-    // FIXME optimize: use database query instead of Map.get
-    Map.get(line_id, calls);
+    ?/anas/all[id == id]/run/id_calls[line_id];
   }
 
   exposed function list(analysis) get_globs(string id){
     /anas/all[id == id]/run/globs;
+  }
+
+  function list(string) get_call_ids(string id){
+    /anas/all[id == id]/run/call_ids;
+  }
+
+  function stringmap(call) get_id_map(string id){
+    /anas/all[id == id]/run/id_calls;
   }
 
   /** this method is called after an upload and goblint has been called already. */
@@ -58,9 +62,9 @@ module Model {
     (random, message)
   }
 
-  function stringmap(call) get_id_map(string id){
-    /anas/all[id == id]/run/id_calls;
-  }
+  //function stringmap(option(call)) get_id_map(string id){
+  //  /anas/all[id == id]/run/id_calls;
+  //}
 
   /** 1. option to trigger an analysis: upload a file */
   function upload_analysis(callback, list((string, arg)) args, form_data) {

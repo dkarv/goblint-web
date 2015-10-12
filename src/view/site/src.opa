@@ -32,7 +32,7 @@ module Src{
       Log.debug("Src", "try to show line: {line_str}");
       if(String.is_empty(line_str) == {false}){
         int line = Int.of_string(line_str);
-        option(call) c = Model.get_call_by_line(id, line);
+        c = Model.get_call_by_line(id, line);
         list(analysis) globs = Model.get_globs(id);
         Site.set_information(#loc-container, c, globs, line_str);
         Log.debug("Src", "reloaded information");
@@ -46,7 +46,8 @@ module Src{
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
-        option(call) c = Model.get_call_by_line(id, line);
+        c = Model.get_call_by_line(id, line);
+        Log.debug("Src","call: {c}");
         list(analysis) globs = Model.get_globs(id);
         Site.set_information(#loc-container, c, globs, "{line}")
         Dom.set_attribute_unsafe(#loc-container, "data-line","{line}")

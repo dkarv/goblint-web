@@ -19,7 +19,8 @@ module Search {
   exposed function list(string) search(string id, expr query){
     // Log.debug("Search","starting search");
     stringmap(call) calls = Model.get_id_map(id);
-    list(string) nodes = Map.To.key_list(calls);
+    list(string) nodes = Model.get_call_ids(id);
+    // Map.To.key_list(calls);
     // wtf: this function -> void is necessary for the compiler...
     Log.debug("Search","wtf");
 
@@ -76,6 +77,8 @@ module Search {
   }
 
   private function list(string) satisfies((string -> bool) f, string searchVar, stringmap(call) calls){
+    // TODO some efficient data structure maybe?
+    // maybe it's also possible to do this in database queries
     Map.To.key_list(
       Map.filter(function(_, val){
         List.exists(function(el){

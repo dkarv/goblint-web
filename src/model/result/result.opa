@@ -36,6 +36,7 @@ type run = {
   list(file) files,
   intmap(call) line_calls,
   stringmap(call) id_calls,
+  list(string) call_ids,
   list(analysis) globs
 }
 

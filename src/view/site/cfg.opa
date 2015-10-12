@@ -29,7 +29,7 @@ module Cfg{
           string line_str = Dom.get_attribute_unsafe(#loc2-container, "data-line");
           Log.debug("Src", "try to show line: {line_str}");
           if(String.is_empty(line_str) == {false}){
-            option(call) c = Model.get_call_by_id(id, line_str);
+            c = Model.get_call_by_id(id, line_str);
             list(analysis) globs = Model.get_globs(id);
             Site.set_information(#loc2-container, c, globs, line_str);
             Log.debug("Src", "reloaded information");
@@ -44,7 +44,8 @@ module Cfg{
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
-        option(call) c = Model.get_call_by_id(id, line_id);
+        c = Model.get_call_by_id(id, line_id);
+        Log.debug("Cfg","call: {c}");
         list(analysis) globs = Model.get_globs(id);
         Site.set_information(#loc2-container, c, globs, line_id);
         Dom.set_attribute_unsafe(#loc2-container, "data-line","{line_id}");
