@@ -30,7 +30,8 @@ module Cfg{
           Log.debug("Src", "try to show line: {line_str}");
           if(String.is_empty(line_str) == {false}){
             option(call) c = Model.get_call_by_id(id, line_str);
-            set_information(c, line_str);
+            list(analysis) globs = Model.get_globs(id);
+            Site.set_information(#loc2-container, c, globs, line_str);
             Log.debug("Src", "reloaded information");
           }
           Log.debug("Src", "ready with reloading src")
@@ -44,26 +45,11 @@ module Cfg{
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
         option(call) c = Model.get_call_by_id(id, line_id);
-        set_information(c, line_id);
-        Dom.set_attribute_unsafe(#loc2-container, "data-line","{line_id}")
+        list(analysis) globs = Model.get_globs(id);
+        Site.set_information(#loc2-container, c, globs, line_id);
+        Dom.set_attribute_unsafe(#loc2-container, "data-line","{line_id}");
         Log.debug("View","loc");
     }
-  }
-
-  client function void set_information(option(call) c, string line_id){
-    res = match(c){
-      case {none}: <h3>No information available</h3>
-      case {some: cl}:
-        <>
-          <h3>{line_id}:</h3>
-          <h4>Context: </h4>
-            {Ana.print_analysis(cl.context)}
-          <h4>Path: </h4>
-            {Ana.print_analysis(cl.path)}
-        </>
-    }
-    _ = Dom.put_inside(#loc2-container, Dom.of_xhtml(res));
-    void
   }
 
   client function collapse_change(_){

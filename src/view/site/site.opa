@@ -39,4 +39,30 @@ module Site {
         show_message(message ^ "<br/>" ^ str, true);
     }
   }
+
+  client function void set_information(dom target, option(call) c, list(analysis) globs, string line_id){
+    res = match(c){
+      case {none}: <h3>No information available</h3>
+      case {some: cl}:
+        <>
+          <h3>{line_id}:</h3>
+          <h4>Context: </h4>
+          {Ana.print_analysis(cl.context)}
+          <h4>Path: </h4>
+          {Ana.print_analysis(cl.path)}
+        </>
+    }
+
+    glob = if(List.is_empty(globs)){
+      <h4>No Globs</h4>
+    }else{
+      <>
+        <h4>Globals: </h4>
+        {Ana.print_analysis(globs)}
+      </>
+    }
+
+    _ = Dom.put_inside(target, Dom.of_xhtml(<>{res}{glob}</>));
+    void
+  }
 }

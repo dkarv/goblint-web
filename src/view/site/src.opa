@@ -33,7 +33,8 @@ module Src{
       if(String.is_empty(line_str) == {false}){
         int line = Int.of_string(line_str);
         option(call) c = Model.get_call_by_line(id, line);
-        set_information(c, line);
+        list(analysis) globs = Model.get_globs(id);
+        Site.set_information(#loc-container, c, globs, line_str);
         Log.debug("Src", "reloaded information");
       }
       Log.debug("Src", "ready with reloading src")
@@ -46,27 +47,10 @@ module Src{
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
         option(call) c = Model.get_call_by_line(id, line);
-        Log.debug("src", "{c}");
-        set_information(c, line)
+        list(analysis) globs = Model.get_globs(id);
+        Site.set_information(#loc-container, c, globs, "{line}")
         Dom.set_attribute_unsafe(#loc-container, "data-line","{line}")
-        Log.debug("View","loc");
     }
-  }
-
-  client function void set_information(option(call) c, int line){
-    res = match(c){
-      case {none}: <h3>No information available</h3>
-      case {some: cl}:
-        <>
-          <h3>Line {line}</h3>
-          <h4>Context: </h4>
-            {Ana.print_analysis(cl.context)}
-          <h4>Path: </h4>
-            {Ana.print_analysis(cl.path)}
-        </>
-    }
-    _ = Dom.put_inside(#loc-container, Dom.of_xhtml(res));
-    void
   }
 
   pretty_print = %%Prettify.prettify%%

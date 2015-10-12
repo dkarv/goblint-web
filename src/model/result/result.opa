@@ -35,7 +35,8 @@ type run = {
   string parameters,
   list(file) files,
   intmap(call) line_calls,
-  stringmap(call) id_calls
+  stringmap(call) id_calls,
+  list(analysis) globs
 }
 
 module Result{

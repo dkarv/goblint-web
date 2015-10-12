@@ -163,22 +163,22 @@ module ResultParser {
   function call parse_call(list((string, RPC.Json.json)) ls){
     int line = match(find(ls, "line")){
       case {some: {String: s}}: Int.of_string(s);
-      default: 0;
+      default: @fail("can't find line in call");
     }
 
     int order = match(find(ls, "order")){
       case {some: {String: s}}: Int.of_string(s);
-      default: 0;
+      default: @fail("can't find order in call");
     }
 
     string id = match(find(ls, "id")){
       case {some: {String: s}}: s;
-      default: "";
+      default: @fail("can't find id in call");
     }
 
     string file = match(find(ls, "file")){
       case {some: {String: s}}: s;
-      default: "";
+      default: @fail("can't find file in call");
     }
 
     list(analysis) context =  match(find(ls, "context")){
@@ -196,6 +196,43 @@ module ResultParser {
     ~{line, order, id, file, context, path}
   }
 
+  function list((string, analysis)) parse_glob(list((string, RPC.Json.json)) ls){
+    string key = match(find(ls, "key")){
+      case {some: {String: s}}:
+        s
+      default:
+        @fail("Found no key for glob");
+    };
+
+    List.map(function(ana){
+      (key, ana)
+    }, parse_list(find(ls, "analysis"), parse_analysis));
+  }
+
+  /**
+   * input has to be sorted in a way that the same analysis are right nest to each other
+   */
+  recursive function list((string, list((string,value)))) merge_globs(list((string,analysis)) input, option((string, list((string, value)))) acc){
+    match(input){
+      case []:
+        match(acc){
+          case {none}: []
+          case {some: x}: [x]
+        }
+      case [(var, a) | ans]:
+        match(acc){
+          case {none}:
+            merge_globs(ans, {some: (a.name, [(var, a.val)])})
+          case {some: (n, ls)}:
+            if(n == a.name){
+              merge_globs(ans, {some: (n, [(var, a.val) | ls])});
+            }else{
+              [(n, ls) | merge_globs(ans, {some: (a.name, [(var, a.val)])} )];
+            }
+        }
+    }
+  }
+
 
   function option(run) parse_json(json){
     match(json){
@@ -207,6 +244,7 @@ module ResultParser {
 
       fs_cs = match(find(r1, "result")){
         case {some: {Record: r2}}:
+          // parse all call elements
           list(call) calls = parse_list(find(r2, "call"), parse_call);
           intmap(call) cs = List.fold(function(el, cs){
             Map.add(el.line, el, cs);
@@ -214,13 +252,31 @@ module ResultParser {
           stringmap(call) cs2 = List.fold(function(el, cs2){
             Map.add(el.id, el, cs2);
           }, calls, Map.empty);
+          // parse all glob elements
+          list(list((string, analysis))) globs = parse_list(find(r2, "glob"), parse_glob);
+
+          list((string, analysis)) flatten_globs = List.rev_flatten(globs);
+
+          list((string, analysis)) sorted_globs = List.sort_by(function((_, ana)){
+            ana.name
+          }, flatten_globs);
+
+          list((string, list((string, value)))) merged_globs = merge_globs(sorted_globs, {none});
+
+          list(analysis) anas = List.map(function((name, gls)){
+            stringmap(value) globs = Map.From.assoc_list(gls);
+            {~name, val: {map: globs}}
+          }, merged_globs);
+          // input: list of list with (variable id, analysis)
+          // first step: sort by analysis: list ((analysis))
+
           { fs: parse_list(find(r2, "file"), parse_file),
-            cs: cs, cs2: cs2}
-        default: {fs: [], cs: Map.empty, cs2: Map.empty}
+            cs: cs, cs2: cs2, globs: anas}
+        default: @fail("No result tag in the xml file?")
       }
 
-      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2}}
-    default: {none}
+      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2, globs: fs_cs.globs}}
+    default: @fail("the xml file seems to be broken?")
     }
   }
 }

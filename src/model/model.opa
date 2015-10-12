@@ -39,6 +39,10 @@ module Model {
     Map.get(line_id, calls);
   }
 
+  exposed function list(analysis) get_globs(string id){
+    /anas/all[id == id]/run/globs;
+  }
+
   /** this method is called after an upload and goblint has been called already. */
   private function (string, option(string)) parse_analysis(file) {
     string random = Random.string(8);
