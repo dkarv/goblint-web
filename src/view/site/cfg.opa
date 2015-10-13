@@ -10,31 +10,33 @@ module Cfg{
             Log.error("Cfg","No cfg found");
           case {some: g}:
             Tab.show(#cfg-tab);
-            %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
-            %%DotRenderer.draw%%(g, callback);
+            load(id, g);
         }
     }
+  }
+
+  client function load(string id, g){
+    %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
+    %%DotRenderer.draw%%(g, callback);
+    Dom.set_value(#collapse-sel, "none");
   }
 
   /** if is displayed right at the moment, reload the cfg */
   client function reload(string id){
     dom parent = Dom.select_id("cfg-tab-parent");
     if(Dom.has_class(parent, "active")){
-      %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
       match(Model.get_cfg(id)){
         case {none}:
           Log.error("Cfg","No cfg found");
         case {some: g}:
-          %%DotRenderer.draw%%(g, callback);
+          load(id, g);
           string line_str = Dom.get_attribute_unsafe(#loc2-container, "data-line");
           Log.debug("Src", "try to show line: {line_str}");
           if(String.is_empty(line_str) == {false}){
             c = Model.get_call_by_id(id, line_str);
             list(analysis) globs = Model.get_globs(id);
             Site.set_information(#loc2-container, c, globs, line_str);
-            Log.debug("Src", "reloaded information");
           }
-          Log.debug("Src", "ready with reloading src")
       }
     }
   }
@@ -55,10 +57,14 @@ module Cfg{
 
   client function collapse_change(_){
     val = Dom.get_value(#collapse-sel);
-    Log.debug("Cfg","collapse change: " ^ val);
+    collapse_level = match(val){
+      case "none": {none};
+      case "one": {one};
+      default: {none};
+    }
     match(Site.get_analysis_id()){
       case {some: id}:
-        option(Model.graph) g = Graph.collapse({one}, id);
+        option(Model.graph) g = Graph.collapse(collapse_level, id);
         match(g){
           case {none}:
             Log.error("Cfg","There was an error: collapsing not possible");

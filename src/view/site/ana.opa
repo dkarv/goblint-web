@@ -7,21 +7,20 @@ module Ana{
   }
 
   private client function xhtml map_ana(analysis an){
-    <>
-      <h5>{an.name}:</h5>
-      {print_value(an.val)}
-    </>
+    id = Dom.fresh_id();
+    body = print_value(an.val);
+    createPanel(id, an.name, body);
   }
 
   private client function xhtml print_value(value val){
     match(val){
       case ~{map}:
-        <ul>
+        <>
           {List.fold(fold_it,
             Map.To.assoc_list(
               Map.map(print_value, map)),
                 <></>)}
-        </ul>
+        </>
       case ~{set}:
         <ul>{List.fold(fold_list, set, <></>)}</ul>
       case ~{data}:
@@ -37,9 +36,38 @@ module Ana{
   }
 
   private client function xhtml fold_it((string key,xhtml val), xhtml acc){
+    id = Dom.fresh_id();
     <>
       {acc}
-      <li>{key}: -> {val}</li>
+      {createPanel(id, key, val)}
     </>
+  }
+
+  private client function xhtml createPanel(string id, string title, xhtml body){
+    <div class="panel panel-default">
+      <div class="panel-heading collapsed" onclick={showPanel(id,_)} data-toggle={id}>
+        <h5 class="panel-title">
+          {title}
+        </h5>
+      </div>
+      <div class="panel-collapse collapse" id={id}>
+        <div class="panel-body">
+          {body}
+        </div>
+      </div>
+    </div>
+  }
+
+  /** triggered when the user clicks on a panel (a collapsable section)*/
+  function showPanel(id, _){
+    elem = Dom.select_id(id);
+    trigger = Dom.select_raw_unsafe("[data-toggle='" + id + "']");
+    if(Dom.has_class(elem, "in")){
+      Dom.remove_class(elem, "in");
+      Dom.add_class(trigger, "collapsed");
+    }else {
+      Dom.add_class(elem, "in");
+      Dom.remove_class(trigger, "collapsed");
+    }
   }
 }

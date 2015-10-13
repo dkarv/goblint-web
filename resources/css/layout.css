@@ -135,9 +135,19 @@ li.dropdown {
     padding-bottom: 5px;
 }
 
+.cfg {
+    border: 1px solid grey;
+    border-radius: 10px;
+}
+
 li.warn:before {
     content: "\e107";
     font-family: "Glyphicons Halflings";
     color: red;
     position: absolute;
+}
+
+#tabs .panel-body{
+    padding: 0;
+    padding-left: 5px;
 }

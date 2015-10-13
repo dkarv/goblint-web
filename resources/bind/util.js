@@ -21,7 +21,6 @@ function add_warning(line, title, text) {
         oldtitle = "";
     }
     elem.attr('title', oldtitle + title + '\n' + text);
-
 }
 
 /**
