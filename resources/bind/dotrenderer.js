@@ -7,12 +7,12 @@ var listener;
  */
 function draw(cfg, click) {
     console.log(cfg);
-    g = new dagreD3.graphlib.Graph().setGraph({});
+    g = new dagreD3.graphlib.Graph({multigraph: true}).setGraph({});
     call(cfg.vertices, function (elem) {
         g.setNode(elem.id, {});
     });
     call(cfg.edges, function (edge) {
-        g.setEdge(edge.start, edge.end, {label: edge.label, description: "TEST<br/>TEST123"});
+        g.setEdge(edge.start, edge.end, {label: edge.label, description: "TEST<br/>TEST123"},Math.random().toString(36).substr(2, 5));
     });
 
     console.log(g);

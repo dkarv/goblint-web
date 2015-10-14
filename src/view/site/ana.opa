@@ -9,7 +9,7 @@ module Ana{
   private client function xhtml map_ana(analysis an){
     id = Dom.fresh_id();
     body = print_value(an.val);
-    createPanel(id, an.name, body);
+    createPanel(id, an.name, body, false);
   }
 
   private client function xhtml print_value(value val){
@@ -39,18 +39,19 @@ module Ana{
     id = Dom.fresh_id();
     <>
       {acc}
-      {createPanel(id, key, val)}
+      {createPanel(id, key, val, true)}
     </>
   }
 
-  private client function xhtml createPanel(string id, string title, xhtml body){
+  private client function xhtml createPanel(string id, string title, xhtml body, bool collapsed){
+    (c1, c2) = if(collapsed){ ("collapsed", "")}else{("", "in")};
     <div class="panel panel-default">
-      <div class="panel-heading collapsed" onclick={showPanel(id,_)} data-toggle={id}>
+      <div class="panel-heading {c1}" onclick={showPanel(id,_)} data-toggle={id}>
         <h5 class="panel-title">
           {title}
         </h5>
       </div>
-      <div class="panel-collapse collapse" id={id}>
+      <div class="panel-collapse collapse {c2}" id={id}>
         <div class="panel-body">
           {body}
         </div>
