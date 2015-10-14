@@ -138,7 +138,7 @@ module Model {
     p = parser {
       x=elem* z=((!["&"] .)*):
         List.fold(function(y, acc){
-          y ^ acc
+          acc ^ y;
         },x, "") ^ Text.to_string(z);
     }
     Parser.parse(p, str);
@@ -178,7 +178,7 @@ module Model {
 
   label = parser {
     case "label =" " "? "\""
-    lbl = ((![\"] .)*) ws* "\"": decode_html(Text.to_string(lbl))
+    lbl = ((![\"] .)*) ws* "\"": decode_html(Text.to_string(lbl));
   }
 
   shape = parser {
