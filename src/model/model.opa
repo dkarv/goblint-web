@@ -95,7 +95,8 @@ module Model {
   /** returns an error message if there was an error. */
   private function option(string) parse_result(id){
     // xml -> json
-    string out = System.exec("xml-json result.xml run", "");
+    string out = System.execo("xml-json result.xml run",
+      { System.exec_default_options with maxBuffer: 1638400 });
     // json -> object
     option(RPC.Json.json) res = Json.deserialize(out);
     either(option(run), string) result = match(res){

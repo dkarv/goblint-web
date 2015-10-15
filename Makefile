@@ -24,7 +24,8 @@ OPACOMPILER ?= opa
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
 PORT = 8080
 
-RUN_OPT = --verbose 8 --goblint "../analyzer/goblint"  --localmode true --startfolder "/"
+# RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "/home/david/git/analyzer/tests/regression/00-sanity/"
+RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "/"
 # 8: everything
 # 7: debug, but not info
 # 6: default, no debug
@@ -35,6 +36,9 @@ run: exe
 	$(RUN_CMD) $(RUN_OPT)
 
 test: exe
-	$(RUN_CMD) $(RUN_OPT) -t 600 --tests true
+	$(RUN_CMD) $(RUN_OPT) --testfile "../analyzer/tests/regression/"
+
+debug: exe
+	$(RUN_CMD) $(RUN_OPT) --testfile $(file) --opentests "google-chrome"
 
 include Makefile.common

@@ -1,7 +1,18 @@
-type parameters = {string goblint, bool localmode, string startfolder, bool testmode}
+type parameters = {
+  string goblint,
+  bool localmode,
+  string startfolder,
+  option(string) testfile,
+  option(string) opentests
+}
 
 module Cmd {
-  parameters defaults = {goblint: "../analyzer/goblint", localmode: false, startfolder: "/", testmode: false};
+  parameters defaults = {
+    goblint: "../analyzer/goblint",
+    localmode: false,
+    startfolder: "/",
+    testfile: {none},
+    opentests: {none}};
   private CommandLine.family(parameters) par_family = {
     title: "Goblint Web parameters",
     init: defaults,
@@ -32,11 +43,19 @@ module Cmd {
         }
       },
       { CommandLine.default_parser with
-        names: ["--tests"],
-        description: "run the unit tests and exit afterwards",
-        param_doc: "<bool>",
+        names: ["--testfile"],
+        description: "give a directory or file that will be parsed recursively for .c files. goblintweb is tested with all these files",
+        param_doc: "<string>",
         on_param: function(state) {
-          parser { case y=Rule.bool: {no_params: {state with testmode: y}}}
+          parser { case y=Rule.consume: {no_params: {state with testfile: {some: y}}}}
+        }
+      },
+      { CommandLine.default_parser with
+        names: ["--opentests"],
+        description: "open tests in browser. specify the executable that is used to open urls here. example: \"google-chrome\"",
+        param_doc: "<string>",
+        on_param: function(state) {
+          parser { case y=Rule.consume: {no_params: {state with opentests: {some: y}}}}
         }
       }
     ]
@@ -44,16 +63,19 @@ module Cmd {
 
   parameters args = CommandLine.filter(par_family)
 
-  function string startfolder(){
+  function startfolder(){
     args.startfolder;
   }
 
-  function bool localmode(){
+  function localmode(){
     args.localmode;
   }
 
-  function bool testmode(){
-    args.testmode;
+  function testfile(){
+    args.testfile;
   }
 
+  function opentests(){
+    args.opentests;
+  }
 }
