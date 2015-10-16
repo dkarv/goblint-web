@@ -8,7 +8,7 @@ module ViewArguments{
     }, args, <></>);
   }
 
-  get_defaults = Arguments.get_defaults;
+  exposed get_defaults = Arguments.get_defaults;
 
   recursive function xhtml html_arg(list((string, arg)) fixed, (string,arg) (str, a)){
     xhtml label =

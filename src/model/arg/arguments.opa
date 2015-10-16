@@ -19,20 +19,54 @@ module Arguments{
   ]
 
   /** get the default arguments. */
-  function get_defaults(){
-    match(global_arg.get()){
+  function get_defaults(option(string) sourcefile){
+    Log.debug("Arguments file","{sourcefile}");
+    args = match(global_arg.get()){
       case ~{some}:
         some
       case {none}:
         ls = parse_args();
         global_arg.set({some: ls});
         ls;
+    };
+
+    re = match(sourcefile){
+      case {none}:
+        args
+      case {some: path}:
+        functions = parse_functions(path);
+        List.map(function((s, elem)){
+          match(s){
+          case "mainfun":
+            // select main if it exists. otherwise just select the 0th function.
+            // if there is no 0th function, select main, too
+            option(int) index = List.index("main",functions);
+            match(index){
+              case {some: i}:
+                (s, {opts: functions, sels: [i]});
+              case {none}:
+                if(List.check_length(functions, 1)){
+                  (s, {opts: functions, sels: [0]});
+                }else{
+                  (s, elem);
+                }
+            }
+          case "exitfun":
+            (s, {opts: functions, sels: []});
+          case "otherfun":
+            (s, {opts: functions, sels: []});
+          default:
+            (s, elem)
+          }
+        }, args);
     }
+
+    re;
   }
 
   /** only return the keys of the arguments. */
-  function get_keys(){
-    List.map(function((a,_)){a}, get_defaults());
+  function get_keys(option(string) sourcefile){
+    List.map(function((a,_)){a}, get_defaults(sourcefile));
   }
 
   function list((string, arg)) parse_args(){
@@ -97,7 +131,6 @@ module Arguments{
     string arguments =
       String.concat(" ",
         List.map(print_arg("",_),args));
-
     analyzer ^ " " ^ arguments;
   }
 
@@ -129,8 +162,19 @@ module Arguments{
   }
 
   function string print_opt(list(string) opts, list(int) sels){
-      String.concat(",",
-        List.map(function(s){"'" ^ s ^ "'" },
-          List.filteri(function(i, _){List.mem(i,sels)},opts)));
+    String.concat(",",
+      List.map(function(s){"'" ^ s ^ "'" },
+        List.filteri(function(i, _){ List.mem(i,sels); },opts)));
+  }
+
+  private function list(string) parse_functions(string sourcefile){
+    string out = System.exec(
+      "grep -Po \"(^int|^char|^void)[^\\(]+\\([^\\)]*\\)\" {sourcefile} | cut -d\" \" -f2 | cut -d\"(\" -f1","");
+    Log.debug("Arg","out: {out}");
+    outs = String.explode("\n",out);
+    outs = List.filter(
+      function(str){String.check_substring(str, 0, "*") == false},
+      outs);
+    outs;
   }
 }

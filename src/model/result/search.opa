@@ -161,7 +161,6 @@ module Search {
       case ~var "[" i1=dec ";" i2=dec "]": {~var, d1: i1, d2: i2, vcmp: {in_}}
       case ~var ~cmp ~val: {~var, ~val, ~cmp}
       case ~var ~icmp ~dec: {~var, ~dec, ~icmp}
-      // TODO add more: unlike, bigger, contains, ...
     }
   /**
    * T -> (S)

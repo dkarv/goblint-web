@@ -62,7 +62,7 @@ module Tests {
               void
           }
           []
-      }}, file, Arguments.get_defaults());
+      }}, file, Arguments.get_defaults({some: file}));
   }
 
   list(string) expected_fails = [

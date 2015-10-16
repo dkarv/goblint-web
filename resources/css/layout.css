@@ -66,7 +66,7 @@ svg.cfg {
     flex: 1 1 auto;
 }
 
-/* display line number in each line TODO do we want that? */
+/* display line number in each line */
 .prettyprint ol.linenums > li {
     list-style-type: decimal;
 }
@@ -144,10 +144,10 @@ li.warn:before {
     content: "\e107";
     font-family: "Glyphicons Halflings";
     color: red;
-    position: absolute;
+    margin-left: -15px;
 }
 
-#tabs .panel-body{
+#tabs .panel-body {
     padding: 0;
     padding-left: 5px;
 }

@@ -12,7 +12,7 @@ function draw(cfg, click) {
         g.setNode(elem.id, {});
     });
     call(cfg.edges, function (edge) {
-        g.setEdge(edge.start, edge.end, {label: edge.label, description: "TEST<br/>TEST123"},Math.random().toString(36).substr(2, 5));
+        g.setEdge(edge.start, edge.end, {label: edge.label},Math.random().toString(36).substr(2, 5));
     });
 
     console.log(g);

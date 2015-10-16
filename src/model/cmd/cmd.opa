@@ -13,6 +13,7 @@ module Cmd {
     startfolder: "/",
     testfile: {none},
     opentests: {none}};
+
   private CommandLine.family(parameters) par_family = {
     title: "Goblint Web parameters",
     init: defaults,

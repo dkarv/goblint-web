@@ -12,6 +12,8 @@ module Cfg{
             Tab.show(#cfg-tab);
             load(id, g);
         }
+        // set the arguments
+        Site.load_arguments(id);
     }
   }
 

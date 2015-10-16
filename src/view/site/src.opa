@@ -8,6 +8,8 @@ module Src{
       load(id);
       Tab.show(#src-tab);
       register_handler("click",callback);
+      // set the arguments
+      Site.load_arguments(id);
     }
   }
 
@@ -45,8 +47,6 @@ module Src{
         list(analysis) globs = Model.get_globs(id);
         Site.set_information(#loc-container, c, globs, line_str);
       }
-
-      //
     }
   }
 

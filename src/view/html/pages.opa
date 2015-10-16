@@ -35,13 +35,15 @@ module Pages {
                     case {none}:
                       Log.error("Pages","can't do live update because there is no ana id");
                     case {some: id}:
+                      file_path = Model.get_file_path(id);
                       Model.rerun_analysis(
                         Site.analysis_finished, id,
-                        ViewArguments.to_arguments("",ViewArguments.get_defaults()));
+                        ViewArguments.to_arguments("",
+                          ViewArguments.get_defaults({some: file_path})));
                   }
                 }
                 }}>
-                {ViewArguments.to_html(ViewArguments.get_defaults())}
+                {ViewArguments.to_html(ViewArguments.get_defaults({none}))}
               </form>
             </li>
           </ul>
@@ -123,7 +125,9 @@ module Pages {
 
       Upload.config my_config = {
         {default_config with form_body: form_body} with process: function(res) {
-          Model.upload_analysis(Site.analysis_finished,ViewArguments.to_arguments("",ViewArguments.get_defaults()),res);
+          Model.upload_analysis(
+            Site.analysis_finished,
+            ViewArguments.to_arguments("",ViewArguments.get_defaults({none})),res);
         }
       }
       <div class="tab-pane" id="upload">

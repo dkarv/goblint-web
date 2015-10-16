@@ -43,6 +43,10 @@ module Model {
     /anas/all[id == id]/run/warnings;
   }
 
+  exposed function string get_file_path(string id){
+    /anas/all[id == id]/filename;
+  }
+
   function list(string) get_call_ids(string id){
     /anas/all[id == id]/run/call_ids;
   }
@@ -79,6 +83,7 @@ module Model {
   }
   /** 2. option to trigger an analysis: pass a local file path */
   exposed function process_file(callback, string file, list((string, arg)) args){
+    Log.debug("Model","arguments: {args}");
     out = System.shell_exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
     stderr = out.result().stderr;
     stderr = stderr ^ if(String.is_empty(stderr)){""}else{"\n"}
