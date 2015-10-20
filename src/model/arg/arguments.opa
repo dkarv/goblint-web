@@ -15,8 +15,7 @@ module Arguments{
     ("outfile", {val: "result.xml"}),
     ("result", {val: "fast_xml"}),
     ("exp", {section: [("cfgdot",{bln: true})]}),
-    ("justcfg", {bln: true})
-  ]
+    ("justcfg", {bln: true})]
 
   /** get the default arguments. */
   function get_defaults(option(string) sourcefile){
@@ -45,7 +44,6 @@ module Arguments{
                 (s, {opts: functions, sels: [i]});
               case {none}:
                 if(List.check_length(functions, 1)){
-                  Log.debug("Arg","select the 0th element because list is at least lenght 1");
                   (s, {opts: functions, sels: [0]});
                 }else{
                   (s, elem);
@@ -75,9 +73,46 @@ module Arguments{
     string content = FileUtils.read("conf.json");
     match(Json.deserialize(content)){
       case ~{some}:
-        parse_arg(some);
+        dir = File.dirname(Cmd.args.goblint);
+        list(string) analyses = parse_analyses(dir);
+        args = parse_arg(some);
+        if(List.is_empty(analyses)){
+          args
+        }else{
+          // make analyses suggestions if parsing analyses was successful
+          List.map(function(ar){
+            match(ar){
+              case ("ana", {section: ls}):
+                ("ana", {section:
+                  List.map(function(ag){
+                    match(ag){
+                      case ("activated", {val: val}):
+                        ("activated", replace_analysis(analyses, val));
+                      case ("ctx_insens", {val: val}):
+                        ("ctx_insens", replace_analysis(analyses, val));
+                      case ("path_sens", {val: val}):
+                        ("path_sens", replace_analysis(analyses, val));
+                      default: ag
+                    }
+                }, ls)})
+              default: ar;
+            }
+          }, args );
+        }
       case {none}: []
     }
+  }
+
+  function replace_analysis(list(string) analyses, string oldval){
+    sels = List.filter_map(function(r){ r },
+      List.mapi(function(i, ana){
+        if(String.contains(oldval, ana)){
+          {some: i}
+        }else{
+          {none}
+        }
+      }, analyses));
+    {opts: analyses, ~sels}
   }
 
   /** changes the arguments in the second parameter if they are in the first list. */
@@ -177,5 +212,13 @@ module Arguments{
       function(str){String.check_substring(str, 0, "*") == false},
       outs);
     outs;
+  }
+
+  private function list(string) parse_analyses(string goblint_dir){
+    string out = System.exec(
+      "grep -Proh \"(?<=let name = \\\")[^\\\"]+(?=\\\")\" {goblint_dir}/src/analyses/","");
+    outs = String.explode("\n",out);
+    Log.debug("Anas","{outs}");
+    outs
   }
 }
