@@ -63,6 +63,42 @@ module Src{
     }
   }
 
+  client function void rerun_analysis(){
+    string txt = Dom.fold(function(d, acc){
+      t = Dom.get_text(d);
+      // prettify or the browser adds a No-Break Space to empty lines:
+      // http://unicode-table.com/de/00A0/
+      // and goblint fails parsing it
+      t = if(String.char_at(t,0) == 160){
+        String.drop_left(1, t);
+      }else{ t }
+
+      acc ^ "\n" ^ t;
+    }, "", Dom.select_raw_unsafe("#src-container li"))
+    ^ "\n";
+
+    txt = String.drop_left(1, txt);
+
+
+    string path = Model.save_src(txt);
+    defaults = ViewArguments.get_defaults({some: path});
+    Log.debug("Src.defaults","{defaults}");
+    Model.process_file(Site.analysis_finished, path,
+      ViewArguments.to_arguments("",
+        defaults));
+    // rerun prettify
+    // pretty print refuses to pretty print again if class prettyprinted is there
+    // Dom.remove_class(#src-container, "prettyprinted");
+    // Dom.set_text(#src-container, txt);
+    // pretty_print();
+    Log.debug("Src","source changed: {txt}");
+  }
+
+  client function void src_changed(){
+    Dom.show(#rerun-button);
+    Log.debug("Pages","src changed");
+  }
+
   pretty_print = %%Prettify.prettify%%
   register_handler = %%Util.register_line_handler%%
   add_warning = %%Util.add_warning%%

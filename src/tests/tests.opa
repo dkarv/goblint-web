@@ -44,10 +44,12 @@ module Tests {
   }
 
   function list(string) test_file(string file){
+    args = Arguments.get_defaults({some: file});
     Model.process_file(function(id, stdout, msg){
       match(msg){
         case {some: m}:
           Log.warning("parse_test","fail: {file}:\n{m}\n{stdout}\n");
+          Log.debug("arguments:","{args}");
           if( Option.is_some(List.index(file, expected_fails)) ){
             Log.debug("Test","expected fail: {file}");
             []
@@ -62,7 +64,7 @@ module Tests {
               void
           }
           []
-      }}, file, Arguments.get_defaults({some: file}));
+      }}, file, args);
   }
 
   list(string) expected_fails = [
@@ -82,7 +84,7 @@ module Tests {
     "../analyzer/tests/regression/14-osek/04-cubbyhole.c",
     "../analyzer/tests/regression/14-osek/03-example_fun.c",
     "../analyzer/tests/regression/14-osek/02-example.c",
-    "../analyzer/tests/regression/14-osek/01-privatize.c",
+    "../analyzer/tests/regression/14-osek/01-privatize.c"/*,
     "../analyzer/tests/regression/13-privatized/16-opencode_offs.c",
     "../analyzer/tests/regression/13-privatized/14-opencode_dyn.c",
     "../analyzer/tests/regression/13-privatized/13-opencode_sound.c",
@@ -103,6 +105,6 @@ module Tests {
     "../analyzer/tests/regression/04-mutex/32-allfuns.c",
     "../analyzer/tests/regression/02-base/31-list_type.c",
     "../analyzer/tests/regression/02-base/10-init_allfuns.c",
-    "../analyzer/tests/regression/00-sanity/14-startstate.c",
+    "../analyzer/tests/regression/00-sanity/14-startstate.c",*/
   ]
 }

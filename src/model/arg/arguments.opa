@@ -20,7 +20,6 @@ module Arguments{
 
   /** get the default arguments. */
   function get_defaults(option(string) sourcefile){
-    Log.debug("Arguments file","{sourcefile}");
     args = match(global_arg.get()){
       case ~{some}:
         some
@@ -39,13 +38,14 @@ module Arguments{
           match(s){
           case "mainfun":
             // select main if it exists. otherwise just select the 0th function.
-            // if there is no 0th function, select main, too
+            // if there is no 0th function, select main
             option(int) index = List.index("main",functions);
             match(index){
               case {some: i}:
                 (s, {opts: functions, sels: [i]});
               case {none}:
                 if(List.check_length(functions, 1)){
+                  Log.debug("Arg","select the 0th element because list is at least lenght 1");
                   (s, {opts: functions, sels: [0]});
                 }else{
                   (s, elem);
@@ -54,7 +54,8 @@ module Arguments{
           case "exitfun":
             (s, {opts: functions, sels: []});
           case "otherfun":
-            (s, {opts: functions, sels: []});
+            (s, {opts: functions, sels:
+              List.mapi(function(i,_){i}, functions)});
           default:
             (s, elem)
           }

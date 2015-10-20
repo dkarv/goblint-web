@@ -29,7 +29,7 @@ module Pages {
                 dom child = Dom.select_id("upload-tab");
                 dom parent = Dom.select_parent_one(child);
                 isActive = Dom.has_class(parent, "active");
-                if(isActive == {false}){
+                if(isActive == false){
                   // the user is on the cfg or src tab currently, so do a live update
                   match(Site.get_analysis_id()){
                     case {none}:
@@ -150,7 +150,12 @@ module Pages {
           &nbsp;
         </div>
         <div class="right">
-          <pre class="prettyprint linenums" id=#src-container></pre>
+          <div class="btn btn-default" style="display: none" id=#rerun-button onclick={function(_){
+            Src.rerun_analysis();
+          }}>Rerun analysis</div>
+          <pre class="prettyprint linenums" id=#src-container contenteditable="true" oninput={function(_){
+            Src.src_changed();
+          }}></pre>
         </div>
       </div>
     case {cfg}:

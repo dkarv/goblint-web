@@ -81,20 +81,27 @@ module Model {
       process_file(callback, file, args);
     },form_data.uploaded_files);
   }
+
   /** 2. option to trigger an analysis: pass a local file path */
   exposed function process_file(callback, string file, list((string, arg)) args){
-    Log.debug("Model","arguments: {args}");
     out = System.shell_exec(Arguments.analyzer_call(args) ^ " " ^ file, "");
     stderr = out.result().stderr;
     stderr = stderr ^ if(String.is_empty(stderr)){""}else{"\n"}
     stdout = out.result().stdout;
     (id, message) = parse_analysis(file);
+    Log.debug("Model","args: {args}");
     callback(id, stderr ^ stdout, message);
   }
   /** 3. option to trigger an analysis: tell to rerun an analysis (maybe with another configuration) */
   exposed function rerun_analysis(callback, string id, list((string, arg)) args){
     string filepath = /anas/all[{id: id}]/filename;
     process_file(callback, filepath, args);
+  }
+  /** 4. */
+  exposed function save_src(string src){
+    string file = "input/" ^ Random.string(20) ^ ".c";
+    FileUtils.write(file, Binary.of_string(src));
+    file;
   }
 
   /** returns an error message if there was an error. */
