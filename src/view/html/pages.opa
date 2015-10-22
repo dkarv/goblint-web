@@ -79,6 +79,8 @@ module Pages {
         <a id=#upload-tab data-target="#upload"
           onclick={function (_){
             Tab.show(#upload-tab);
+            xhtml args = ViewArguments.to_html(ViewArguments.get_defaults({none}));
+            _ = Dom.put_inside(#arguments, Dom.of_xhtml(args));
             %%Util.pushState%%("/");
           }}>Upload</a>
       </li>
@@ -201,6 +203,15 @@ module Pages {
               </tr>
               <tr>
                 <td>x[int_1;int_2]</td><td>x &gt;= int_1 and x &lt;=int_2</td>
+              </tr>
+            </table>
+            <h4>Some special commands:</h4>
+            <table>
+              <tr>
+                <td>\{1,2,fun283\}</td><td>just give a list of nodes you want to highlight</td>
+              </tr>
+              <tr>
+                <td>\{dead\}</td><td>highlight all dead nodes</td>
               </tr>
             </table>
             <h4>Combine the rules above:</h4>

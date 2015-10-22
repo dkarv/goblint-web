@@ -39,6 +39,10 @@ module Model {
     /anas/all[id == id]/run/globs;
   }
 
+  exposed function list(string) get_unreachables(string id){
+    /anas/all[id == id]/run/unreachables;
+  }
+
   exposed function list(warning) get_warnings(string id){
     /anas/all[id == id]/run/warnings;
   }
@@ -89,7 +93,6 @@ module Model {
     stderr = stderr ^ if(String.is_empty(stderr)){""}else{"\n"}
     stdout = out.result().stdout;
     (id, message) = parse_analysis(file);
-    Log.debug("Model","args: {args}");
     callback(id, stderr ^ stdout, message);
   }
   /** 3. option to trigger an analysis: tell to rerun an analysis (maybe with another configuration) */

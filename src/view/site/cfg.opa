@@ -21,6 +21,7 @@ module Cfg{
     %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
     %%DotRenderer.draw%%(g, callback);
     Dom.set_value(#collapse-sel, "none");
+    search_changed();
   }
 
   /** if is displayed right at the moment, reload the cfg */
@@ -80,22 +81,27 @@ module Cfg{
   }
 
   client function search_change(_){
+    search_changed();
+  }
+
+  client function search_changed(){
     string query = Dom.get_value(#search_cfg);
-    match(Site.get_analysis_id()){
-      case {some: id}:
-        option(list(string)) ls = Search.parse_and_search(id, query);
-          match(ls){
-            case {some: ss}:
-              %%DotRenderer.highlight%%(ss);
-              Site.hide_message();
-              Dom.set_style_property_unsafe(#search_cfg, "border-color", "#3c763d");
-            case {none}:
-              Dom.set_style_property_unsafe(#search_cfg, "border-color","#a94442");
-              Site.show_message("You have a syntax error in your expression", true);
-          }
-      case {none}:
-        Log.error("Cfg","no analysis id found");
+    if((query == "") == false){
+      match(Site.get_analysis_id()){
+        case {some: id}:
+          option(list(string)) ls = Search.parse_and_search(id, query);
+            match(ls){
+              case {some: ss}:
+                %%DotRenderer.highlight%%(ss);
+                Site.hide_message();
+                Dom.set_style_property_unsafe(#search_cfg, "border-color", "#3c763d");
+              case {none}:
+                Dom.set_style_property_unsafe(#search_cfg, "border-color","#a94442");
+                Site.show_message("You have a syntax error in your expression", true);
+            }
+        case {none}:
+          Log.error("Cfg","no analysis id found");
+      }
     }
-    Log.debug("Cfg","finished search");
   }
 }

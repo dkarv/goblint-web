@@ -8,6 +8,9 @@ type expr =
   {string var, string val, comp cmp} or
   {string var, int dec, icomp icmp} or
   {string var, int d1, int d2, vcomp vcmp} or
+  /** just a list of node ids  */
+  {list(string) nodes} or
+  {unreachables} or
   /** this | that */
   {expr e1, expr e2, binop bi} or
   /** !(not)*/
@@ -20,12 +23,24 @@ module Search {
     // Log.debug("Search","starting search");
     stringmap(call) calls = Model.get_id_map(id);
     list(string) nodes = Model.get_call_ids(id);
-    // Map.To.key_list(calls);
-    // wtf: this function -> void is necessary for the compiler...
-    Log.debug("Search","wtf");
+    g = match(Model.get_cfg(id)){
+      case {none}:
+        @fail("No graph found");
+      case {some: g}:
+        Graph.build(g.edges);
+    }
+    Log.debug("Search","struct graph {g}");
+    // wtf: this void is necessary for the compiler...
+    void
 
     recursive function list(string) inner(expr query){
       match(query){
+        case {nodes: nds}:
+          List.filter(function(n){
+            List.contains(n, nodes);
+          }, nds);
+        case {unreachables}:
+          Model.get_unreachables(id);
         case {e: e, un: {not_}}:
           list(string) res_e = inner(e);
           List.filter(function(el){
@@ -153,11 +168,20 @@ module Search {
       case ">": {gt_}
       case "<": {lt_}
     }
-
+    node = parser {
+      case n=((![,}] .)*): Text.to_string(n);
+    }
+    recursive node_list = parser {
+      case "," ~node ~node_list: [node | node_list];
+      case "": [];
+    }
     dec = parser {
       case i=Rule.integer: i;
     }
+
     parser {
+      case "\{dead\}": {unreachables}
+      case "\{" ~node ~node_list "\}": {nodes: [node | node_list]};
       case ~var "[" i1=dec ";" i2=dec "]": {~var, d1: i1, d2: i2, vcmp: {in_}}
       case ~var ~cmp ~val: {~var, ~val, ~cmp}
       case ~var ~icmp ~dec: {~var, ~dec, ~icmp}

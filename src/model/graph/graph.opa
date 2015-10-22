@@ -1,5 +1,98 @@
 type state = {none} or {one}
+
+type node_down = {string id, list(node_down) post}
+
 module Graph {
+  function list(node_down) build(list(edge) edges){
+    Log.debug("Graph","{edges}");
+    List.fold(insert_down, edges,[])
+  }
+
+  function list(node_down) insert_down(edge e, list(node_down) old){
+    // 2 -> 4
+    match(old){
+      case [o | os]:
+        // TODO make this an option(node_down)
+        (new_node, success) = map_down_while(function(nd){
+          if(nd.id == e.start){
+            // make sure this id is not in the post list yet (could happen if there are more than one edges between two nodes)
+            if(List.exists(function(n){
+              n.id == e.end
+            }, nd.post)){
+              {some: {id: nd.id, post: [ {id: e.end, post: []} | nd.post]}}
+            } else {
+              {some: nd}
+            }
+          }else{
+            {none}
+          }
+        }, o);
+
+        if(success){
+          // do not continue going down, we found what we were looking for
+          // this may be a problem:
+          [new_node | os]
+        } else {
+          // search deeper
+          [o | insert_down(e, os)]
+        }
+
+      case []:
+        [{id: e.start, post: [{id: e.end, post: []}]}]
+    }
+  }
+
+  function option(node_down) find_down(string id, node_down nd){
+    search_down(function(x){x.id == id}, nd)
+  }
+
+  function option(node_down) search_down(fn, node_down nd){
+    if(fn(nd)){
+      {some: nd}
+    }else{
+      recursive aux = function(ls){
+        match(ls){
+          case []:
+            {none}
+          case [l | ls]:
+            match(search_down(fn, l)){
+              case ~{some}:
+                {some: some}
+              case {none}:
+                // continue recursive
+                aux(ls);
+            }
+        }
+      }
+
+      aux(nd.post);
+    }
+  }
+
+  function (node_down, bool) map_down_while(fn, node_down nd){
+    match(fn(nd)){
+      case {some: x}:
+        (x, true)
+      case {none}:
+        recursive map = function(ls){
+          match(ls){
+            case [l | ls]:
+              (n, success) = map_down_while(fn, l);
+              if(success){
+                ([n | ls], true)
+              }else{
+                (ls, success) = map(ls);
+                ([l | ls], success)
+              }
+            case []:
+              ([], false)
+          }
+        }
+        (ls, success) = map(nd.post)
+        ({id: nd.id, post: ls}, success)
+    }
+  }
+
   function option(Model.graph) collapse(state st, string id){
     g = Model.get_cfg(id);
     match(g){

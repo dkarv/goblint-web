@@ -270,53 +270,51 @@ module ResultParser {
   function option(run) parse_json(json){
     match(json){
     case {Record: r1}:
-      string par = match(find(r1, "parameters")){
+      string parameters = match(find(r1, "parameters")){
         case {some: {String: s}}: s;
         default: @fail("Parser: no parameters?")
       }
 
-      fs_cs = match(find(r1, "result")){
+      r2 = match(find(r1, "result")){
         case {some: {Record: r2}}:
-          // parse all call elements
-          list(call) calls = parse_list(find(r2, "call"), parse_call);
-          intmap(call) cs = List.fold(function(el, cs){
-            Map.add(el.line, el, cs);
-          }, calls, Map.empty);
-
-          stringmap(call) cs2 = List.fold(function(el, cs2){
-            Map.add(el.id, el, cs2);
-          }, calls, Map.empty);
-
-          list(string) call_ids = Map.To.key_list(cs2);
-
-          // #######################
-          // parse all glob elements
-          list(list((string, analysis))) globs = parse_list(find(r2, "glob"), parse_glob);
-
-          list((string, analysis)) flatten_globs = List.rev_flatten(globs);
-
-          list((string, analysis)) sorted_globs = List.sort_by(function((_, ana)){
-            ana.name
-          }, flatten_globs);
-
-          list((string, list((string, value)))) merged_globs = merge_globs(sorted_globs, {none});
-
-          list(analysis) anas = List.map(function((name, gls)){
-            stringmap(value) globs = Map.From.assoc_list(gls);
-            {~name, val: {map: globs}}
-          }, merged_globs);
-
-          // ##################
-          // parse all warnings
-          list(warning) warnings = parse_list(find(r2, "warning"), parse_warning);
-
-          // return
-          { fs: parse_list(find(r2, "file"), parse_file),
-            ~cs, ~cs2, globs: anas, ~call_ids, ~warnings}
-        default: @fail("No result tag in the xml file?")
+          r2
+        default: @fail("No result tag in the xml file?");
       }
 
-      {some: {parameters: par, files: fs_cs.fs, line_calls: fs_cs.cs, id_calls: fs_cs.cs2, globs: fs_cs.globs, call_ids: fs_cs.call_ids, warnings: fs_cs.warnings}}
+      list(call) calls = parse_list(find(r2, "call"), parse_call);
+
+      intmap(call) line_calls = List.fold(function(el, cs){
+        Map.add(el.line, el, cs);
+      }, calls, Map.empty);
+
+      stringmap(call) id_calls = List.fold(function(el, cs2){
+        Map.add(el.id, el, cs2);
+      }, calls, Map.empty);
+
+      list(string) call_ids = Map.To.key_list(id_calls);
+
+      list(list((string, analysis))) raw_globs = parse_list(find(r2, "glob"), parse_glob);
+      list((string, analysis)) flatten_globs = List.rev_flatten(raw_globs);
+      list((string, analysis)) sorted_globs = List.sort_by(function((_, ana)){
+        ana.name
+      }, flatten_globs);
+      list((string, list((string, value)))) merged_globs = merge_globs(sorted_globs, {none});
+      list(analysis) globs = List.map(function((name, gls)){
+        stringmap(value) globs = Map.From.assoc_list(gls);
+        {~name, val: {map: globs}}
+      }, merged_globs);
+
+      list(warning) warnings = parse_list(find(r2, "warning"), parse_warning);
+
+      list(file) files = parse_list(find(r2, "file"), parse_file);
+
+      list(string) unreachables = Map.To.key_list(
+        Map.filter(function(_, call){
+          List.is_empty(call.path)
+        },id_calls)
+      );
+
+      {some: ~{files, line_calls, id_calls, globs, call_ids, warnings, parameters, unreachables}}
     default: @fail("the xml file seems to be broken?")
     }
   }

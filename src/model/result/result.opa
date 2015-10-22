@@ -49,7 +49,8 @@ type run = {
   stringmap(call) id_calls,
   list(string) call_ids,
   list(analysis) globs,
-  list(warning) warnings
+  list(warning) warnings,
+  list(string) unreachables
 }
 
 module Result{
