@@ -1,4 +1,4 @@
-type unop = {not_}
+type unop = {not_} or {pre_} or {post_}
 type binop = {and_} or {or_}
 type comp = {eq_}
 type icomp = {gt_} or {lt_}
@@ -13,7 +13,7 @@ type expr =
   {unreachables} or
   /** this | that */
   {expr e1, expr e2, binop bi} or
-  /** !(not)*/
+  /** !(not), =>(nodes), <=(nodes)*/
   {expr e, unop un}
 
 
@@ -23,35 +23,49 @@ module Search {
     // Log.debug("Search","starting search");
     stringmap(call) calls = Model.get_id_map(id);
     list(string) nodes = Model.get_call_ids(id);
+    // TODO only do this if there is a search criteria that requires it
     g = match(Model.get_cfg(id)){
       case {none}:
         @fail("No graph found");
       case {some: g}:
         Graph.build(g.edges);
     }
-    Log.debug("Search","struct graph {g}");
+    Log.debug("Search","struct graph \n{g}");
     // wtf: this void is necessary for the compiler...
     void
 
     recursive function list(string) inner(expr query){
       match(query){
+        // just a list of nodes: {1,2,3}
         case {nodes: nds}:
           List.filter(function(n){
             List.contains(n, nodes);
           }, nds);
+        // {dead}: all unreachable nodes
         case {unreachables}:
           Model.get_unreachables(id);
+        // negation: !(...)
         case {e: e, un: {not_}}:
           list(string) res_e = inner(e);
           List.filter(function(el){
-            if(List.mem(el, res_e)){{false}}else{{true}};
+            if(List.mem(el, res_e ++ Model.get_unreachables(id))){
+              false
+            }else{
+              true
+            };
           }, nodes);
+        case {e: e, un: {post_}}:
+          Graph.find_posts(inner(e), g);
+        case {e: e, un: {pre_}}:
+          Graph.find_pres(inner(e), g);
+        // AND: e1 & e2
         case {~e1, ~e2, bi: {and_}}:
           list(string) res_e1 = inner(e1);
           list(string) res_e2 = inner(e2);
           List.filter(function(el){
             List.mem(el, res_e1);
           }, res_e2);
+        // OR: e1 & e2
         case {~e1, ~e2, bi: {or_}}:
           list(string) res_e1 = inner(e1);
           list(string) res_e2 = inner(e2);
@@ -70,7 +84,7 @@ module Search {
               i1 < searchValue
             }
           }
-          Log.debug("Search","wtf");
+          void
           satisfies_int(f, searchVar, calls)
         case {var: searchVar, ~d1, ~d2, vcmp: {in_}}:
           satisfies_int(function(i){
@@ -195,6 +209,8 @@ module Search {
     parser {
       case "(" expr=S ")": expr
       case "!" expr=S: {e: expr, un: {not_}}
+      case "<" expr=S: {e: expr, un: {pre_}}
+      case ">" expr=S: {e: expr, un: {post_}}
       case cond=C: cond
     }
   /**

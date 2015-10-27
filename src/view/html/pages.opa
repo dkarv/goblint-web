@@ -189,45 +189,25 @@ module Pages {
           <div id=#search-help style="display: none;">
             <h4>Compare variable x with values:</h4>
             <table>
-              <tr>
-                <td>x=string</td><td>var x has exact value string</td>
-              </tr>
-              <tr>
-                <td>x=int</td><td>x has exact value int</td>
-              </tr>
-              <tr>
-                <td>x&lt;int</td><td>x smaller than int</td>
-              </tr>
-              <tr>
-                <td>x&gt;int</td><td>x bigger than int</td>
-              </tr>
-              <tr>
-                <td>x[int_1;int_2]</td><td>x &gt;= int_1 and x &lt;=int_2</td>
-              </tr>
+              {tr("x=string", "var x has exact value string")}
+              {tr("x=int", "x has exact value int")}
+              {tr("x&lt;int","x smaller than int")}
+              {tr("x&gt;int","x bigger than int")}
+              {tr("x[int_1;int_2]","x &gt;= int_1 and x &lt;=int_2")}
             </table>
             <h4>Some special commands:</h4>
             <table>
-              <tr>
-                <td>\{1,2,fun283\}</td><td>just give a list of nodes you want to highlight</td>
-              </tr>
-              <tr>
-                <td>\{dead\}</td><td>highlight all dead nodes</td>
-              </tr>
+              {tr("\{1,2,fun283\}", "just give a list of nodes you want to highlight")}
+              {tr("\{dead\}", "highlight all dead nodes")}
             </table>
             <h4>Combine the rules above:</h4>
             <table>
-              <tr>
-                <td>expr_1|expr_2</td><td>expr_1 OR expr_2</td>
-              </tr>
-              <tr>
-                <td>expr_1&expr_2</td><td>expr_1 AND expr_2</td>
-              </tr>
-              <tr>
-                <td>(expr)</td><td>Change the precedence of expressions</td>
-              </tr>
-              <tr>
-                <td>!expr</td><td>Negate the expr</td>
-              </tr>
+              {tr("expr_1|expr_2","expr_1 OR expr_2")}
+              {tr("expr_1&expr_2","expr_1 AND expr_2")}
+              {tr("(expr)","Change the precedence of expressions")}
+              {tr("!expr","Negate the expr")}
+              {tr(">expr","All nodes that are reachable from the nodes this expression found")}
+              {tr("<expr","Highlight all nodes from which the nodes in expr are reachable")}
             </table>
           </div>
             <svg class="cfg"><g></g></svg>
@@ -235,5 +215,9 @@ module Pages {
           </div>
       </div>
     }
+  }
+
+  function tr(string one, string two){
+    <tr><td>{one}</td><td>{two}</td></tr>
   }
 }
