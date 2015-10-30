@@ -1,9 +1,9 @@
-/** @opaType Model.graph */
+/** @opaType graph */
 /** @opaType list('a) */
 var g;
 var listener;
 /**
- * @register {Model.graph, (string -> void)-> void}
+ * @register {graph, (string -> void)-> void}
  */
 function draw(cfg, click) {
     console.log(cfg);

@@ -35,7 +35,7 @@ module Pages {
                     case {none}:
                       Log.error("Pages","can't do live update because there is no ana id");
                     case {some: id}:
-                      file_path = Model.get_file_path(id);
+                      file_path = Database.get_file_path(id);
                       Model.rerun_analysis(
                         Site.analysis_finished, id,
                         ViewArguments.to_arguments("",

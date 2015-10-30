@@ -15,7 +15,7 @@ module Src{
 
   client function load(string id){
     %%Util.pushState%%("/ana/" ^ id ^ "/src");
-    src = Model.get_src(id);
+    src = Database.get_src(id);
     Dom.set_text(#src-container, src);
     // pretty print refuses to pretty print again if class prettyprinted is there
     Dom.remove_class(#src-container, "prettyprinted");
@@ -23,7 +23,7 @@ module Src{
 
     // load the warnings
     // TODO show on which lines there's information available
-    list(warning) warnings = Model.get_warnings(id);
+    list(warning) warnings = Database.get_warnings(id);
     List.iter(function(warn){
       List.iter(function(item){
         add_warning(item.line, warn.group, item.txt)
@@ -43,8 +43,8 @@ module Src{
       string line_str = Dom.get_attribute_unsafe(#loc-container, "data-line");
       if(String.is_empty(line_str) == {false}){
         int line = Int.of_string(line_str);
-        c = Model.get_call_by_line(id, line);
-        list(analysis) globs = Model.get_globs(id);
+        c = Database.get_call_by_line(id, line);
+        list(analysis) globs = Database.get_globs(id);
         Site.set_information(#loc-container, c, globs, line_str);
       }
     }
@@ -55,9 +55,9 @@ module Src{
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
-        c = Model.get_call_by_line(id, line);
+        c = Database.get_call_by_line(id, line);
         Log.debug("Src","call: {c}");
-        list(analysis) globs = Model.get_globs(id);
+        list(analysis) globs = Database.get_globs(id);
         Site.set_information(#loc-container, c, globs, "{line}")
         Dom.set_attribute_unsafe(#loc-container, "data-line","{line}")
     }
@@ -86,11 +86,6 @@ module Src{
     Model.process_file(Site.analysis_finished, path,
       ViewArguments.to_arguments("",
         defaults));
-    // rerun prettify
-    // pretty print refuses to pretty print again if class prettyprinted is there
-    // Dom.remove_class(#src-container, "prettyprinted");
-    // Dom.set_text(#src-container, txt);
-    // pretty_print();
     Log.debug("Src","source changed: {txt}");
   }
 

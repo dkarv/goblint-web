@@ -1,68 +1,11 @@
-type vertex = {string id, string shape, string label}
-type edge = {string start, string end, string label}
-type Model.graph = {list(edge) edges, list(vertex) vertices}
-type ana = { string id, string filename, option(Model.graph) cfg, option(string) dotfile, run run}
-
 type either('a, 'b) = {'a this} or {'b that}
-database anas {
-  ana /all[{id}]
-}
 
 module Model {
-
-  /* do not use often. throws stackoverflows even for quite small analysis'*/
-  exposed function get_analysis(id) {
-    /anas/all[{id: id}];
-  }
-
-  exposed function get_src(id){
-    FileUtils.read(/anas/all[{id: id}]/filename);
-  }
-
-  exposed function get_dotfile(id){
-    /anas/all[{id: id}]/dotfile;
-  }
-
-  exposed function get_cfg(id){
-    /anas/all[{id: id}]/cfg;
-  }
-
-  exposed function option(call) get_call_by_line(string id, int line) {
-    ?/anas/all[id == id]/run/line_calls[line];
-  }
-
-  exposed function option(call) get_call_by_id(string id, string line_id) {
-    ?/anas/all[id == id]/run/id_calls[line_id];
-  }
-
-  exposed function list(analysis) get_globs(string id){
-    /anas/all[id == id]/run/globs;
-  }
-
-  exposed function list(string) get_unreachables(string id){
-    /anas/all[id == id]/run/unreachables;
-  }
-
-  exposed function list(warning) get_warnings(string id){
-    /anas/all[id == id]/run/warnings;
-  }
-
-  exposed function string get_file_path(string id){
-    /anas/all[id == id]/filename;
-  }
-
-  function list(string) get_call_ids(string id){
-    /anas/all[id == id]/run/call_ids;
-  }
-
-  function stringmap(call) get_id_map(string id){
-    /anas/all[id == id]/run/id_calls;
-  }
 
   /** this method is called after an upload and goblint has been called already. */
   private function (string, option(string)) parse_analysis(file) {
     string random = Random.string(8);
-    /anas/all[{id: random}]/filename = file;
+    Database.save_filename(random, file)
     message = match(parse_cfg(random, file)){
       case {some: _} as r: r
       case {none}:
@@ -166,7 +109,7 @@ module Model {
     string dot_file = "cfgs/" ^ cfg_folder ^ "/main.dot";
     if(File.exists(dot_file)){
       string s = FileUtils.read(dot_file);
-      option(Model.graph) result = parse_graph(s);
+      option(graph) result = parse_graph(s);
       match(result){
         case {some: g}:
          /anas/all[~{id}]/cfg <- some(g);

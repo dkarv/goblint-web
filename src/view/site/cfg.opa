@@ -5,7 +5,7 @@ module Cfg{
       case {none}:
         Log.error("cfg", "analysis not finished yet");
       case {some: id}:
-        match(Model.get_cfg(id)){
+        match(Database.get_cfg(id)){
           case {none}:
             Log.error("Cfg","No cfg found");
           case {some: g}:
@@ -28,7 +28,7 @@ module Cfg{
   client function reload(string id){
     dom parent = Dom.select_id("cfg-tab-parent");
     if(Dom.has_class(parent, "active")){
-      match(Model.get_cfg(id)){
+      match(Database.get_cfg(id)){
         case {none}:
           Log.error("Cfg","No cfg found");
         case {some: g}:
@@ -36,8 +36,8 @@ module Cfg{
           string line_str = Dom.get_attribute_unsafe(#loc2-container, "data-line");
           Log.debug("Src", "try to show line: {line_str}");
           if(String.is_empty(line_str) == {false}){
-            c = Model.get_call_by_id(id, line_str);
-            list(analysis) globs = Model.get_globs(id);
+            c = Database.get_call_by_id(id, line_str);
+            list(analysis) globs = Database.get_globs(id);
             Site.set_information(#loc2-container, c, globs, line_str);
           }
       }
@@ -49,9 +49,9 @@ module Cfg{
       case {none}:
         Log.error("src","clicked line but found no ana id");
       case {some: id}:
-        c = Model.get_call_by_id(id, line_id);
+        c = Database.get_call_by_id(id, line_id);
         Log.debug("Cfg","call: {c}");
-        list(analysis) globs = Model.get_globs(id);
+        list(analysis) globs = Database.get_globs(id);
         Site.set_information(#loc2-container, c, globs, line_id);
         Dom.set_attribute_unsafe(#loc2-container, "data-line","{line_id}");
         Log.debug("View","loc");
@@ -67,7 +67,7 @@ module Cfg{
     }
     match(Site.get_analysis_id()){
       case {some: id}:
-        option(Model.graph) g = Graph.collapse(collapse_level, id);
+        option(graph) g = Graph.collapse(collapse_level, id);
         match(g){
           case {none}:
             Log.error("Cfg","There was an error: collapsing not possible");

@@ -21,10 +21,10 @@ type expr =
 module Search {
   exposed function list(string) search(string id, expr query){
     // Log.debug("Search","starting search");
-    stringmap(call) calls = Model.get_id_map(id);
-    list(string) nodes = Model.get_call_ids(id);
+    stringmap(call) calls = Database.get_id_map(id);
+    list(string) nodes = Database.get_call_ids(id);
     // TODO only do this if there is a search criteria that requires it
-    g = match(Model.get_cfg(id)){
+    g = match(Database.get_cfg(id)){
       case {none}:
         @fail("No graph found");
       case {some: g}:
@@ -43,12 +43,12 @@ module Search {
           }, nds);
         // {dead}: all unreachable nodes
         case {unreachables}:
-          Model.get_unreachables(id);
+          Database.get_unreachables(id);
         // negation: !(...)
         case {e: e, un: {not_}}:
           list(string) res_e = inner(e);
           List.filter(function(el){
-            if(List.mem(el, res_e ++ Model.get_unreachables(id))){
+            if(List.mem(el, res_e ++ Database.get_unreachables(id))){
               false
             }else{
               true

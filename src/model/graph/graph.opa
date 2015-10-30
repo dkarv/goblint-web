@@ -197,8 +197,8 @@ module Graph {
     }, starts, nodes).f2
   }
 
-  function option(Model.graph) collapse(state st, string id){
-    g = Model.get_cfg(id);
+  function option(graph) collapse(state st, string id){
+    g = Database.get_cfg(id);
     match(g){
       case {none}:
         {none}
@@ -207,7 +207,7 @@ module Graph {
     }
   }
 
-  private function Model.graph collapse_graph(Model.graph g, state st){
+  private function graph collapse_graph(graph g, state st){
     match(st){
       case {none}: g
       case {one}:

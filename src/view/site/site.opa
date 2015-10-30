@@ -67,7 +67,7 @@ module Site {
   }
 
   function void load_arguments(string id){
-    string file_path = Model.get_file_path(id);
+    string file_path = Database.get_file_path(id);
     xhtml args = ViewArguments.to_html(ViewArguments.get_defaults({some: file_path}));
     _ = Dom.put_inside(#arguments, Dom.of_xhtml(args));
     void

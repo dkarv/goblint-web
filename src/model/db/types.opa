@@ -1,3 +1,31 @@
+/**
+ * contains the most important types. the main advantage is, that you can import them without a big overhead.
+ */
+type vertex = {
+  string id,
+  string shape,
+  string label
+}
+
+type edge = {
+  string start,
+  string end,
+  string label
+}
+
+type graph = {
+  list(edge) edges,
+  list(vertex) vertices
+}
+
+type ana = {
+  string id,
+  string filename,
+  option(graph) cfg,
+  option(string) dotfile,
+  run run
+}
+
 type value = {
   stringmap(value) map
 } or {
@@ -53,6 +81,6 @@ type run = {
   list(string) unreachables
 }
 
-module Result{
+module Types{
 
 }
