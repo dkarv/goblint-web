@@ -6,8 +6,10 @@ result.xml
 .idea/*
 _build
 _tracks
-goblintserver.exe
+goblintweb.exe
 opa-debug
 input
 conf.json
 package.json
+cfgs
+result

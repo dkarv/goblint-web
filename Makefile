@@ -24,8 +24,7 @@ OPACOMPILER ?= opa
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
 PORT = 8080
 
-# RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "/home/david/git/analyzer/tests/regression/00-sanity/"
-RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "/"
+RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "$(shell pwd)"
 # 8: everything
 # 7: debug, but not info
 # 6: default, no debug
