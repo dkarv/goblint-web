@@ -1,5 +1,6 @@
 /**
- * contains the most important types. the main advantage is, that you can import them without a big overhead.
+ * contains the most important types.
+ * the main advantage is, that you can import them without a big overhead.
  */
 type vertex = {
   string id,
@@ -12,10 +13,24 @@ type edge = {
   string end,
   string label
 }
-
+/**
+ * internal representation of a graph.
+ */
 type graph = {
   list(edge) edges,
   list(vertex) vertices
+}
+
+/*
+ * representation of a list of edges.
+ * the tupels represent (nodes, outgoing label)
+ * e is the last node of the edges
+ * a is the first one, together with the first label
+ */
+type edges = {
+  (string, string) a,
+  string e,
+  list((string, string)) es
 }
 
 type ana = {

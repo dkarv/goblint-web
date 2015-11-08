@@ -8,10 +8,10 @@ var listener;
 function draw(cfg, click) {
     console.log(cfg);
     g = new dagreD3.graphlib.Graph({multigraph: true}).setGraph({});
-    call(cfg.vertices, function (elem) {
+    iter(cfg.vertices, function (elem) {
         g.setNode(elem.id, {});
     });
-    call(cfg.edges, function (edge) {
+    iter(cfg.edges, function (edge) {
         g.setEdge(edge.start, edge.end, {label: edge.label},Math.random().toString(36).substr(2, 5));
     });
 
@@ -27,7 +27,7 @@ function draw(cfg, click) {
 function highlight(highlights) {
     console.log(highlights);
     unhighlight();
-    call(highlights, function (elem) {
+    iter(highlights, function (elem) {
         g.setNode(elem, {style: "fill: green"});
     });
     render(g, ".cfg");
@@ -59,7 +59,7 @@ function render(g, target) {
 /**
  * list('a) -> ('a -> void) -> void
  */
-function call(ls, f) {
+function iter(ls, f) {
     while (!ls.hasOwnProperty('nil')) {
         f(ls.hd);
         ls = ls.tl;

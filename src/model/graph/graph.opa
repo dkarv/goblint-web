@@ -6,7 +6,7 @@ type edgelist = {string e, list(string) ls}
 
 module Graph {
   // transform the list
-  function list(edgelist) build(list(edge) edges){
+  function list(edges) build(list(edge) edges){
     Log.debug("Graph","{edges}");
     cnt = List.fold(counter, edges, Map.empty);
     // 1. identify special nodes with (incoming edges != 1 || outgoing edges > 1)
@@ -16,7 +16,7 @@ module Graph {
 
     // 2. construct list: List.map(edge -> [edge.start, edge.end], edges)
     working_list = List.map(function(edge){
-      {e: edge.end, ls: [edge.start, edge.end]};
+      {a: (edge.start, edge.label), e: edge.end, es: []}
     }, edges);
 
     Log.debug("Graph working list", "{working_list}");
@@ -29,98 +29,96 @@ module Graph {
     // searches for elements in the second list that can be merged with the first argument
     // if such an element is found, returns {some: the modified list}
     // otherwise {none}
-    recursive merge_first = function(string first, string last, list(string) others, list(edgelist) es){
+    recursive merge_first = function(edges {a: (a1,l1), e: e1, es: es1} as merge_this, list(edges) es){
       match(es){
         case []: {none}
-        case [a | es]:
-          if(a.e == first){
+        case [{a: a2, e: e2, es: es2} as merge_with | es]:
+          if(e2 == a1){
             // merge and stop going deeper
-            {some: [{e: last, ls: (a.ls ++ others)} | es]}
+            {some: [{e: e1, a: a2, es: (es2 ++ [ (a1,l1) | es1]) } | es]}
           }else{
             // go deeper
-            match(merge_first(first, last, others, es)){
+            match(merge_first(merge_this, es)){
               case {none}: {none}
               case {some: rlist}:
-                {some: [a | rlist]}
+                {some: [merge_with | rlist]}
             }
           }
       }
     }
 
-    recursive merge_last = function(string first, string last, list(string) others, list(edgelist) es){
+    recursive merge_last = function(edges {a: a1, e: e1, es: es1} as merge_this, list(edges) es){
       match(es){
         case []: {none}
-        case [{~e, ls: [l | ls]} as a | es]:
-          if(l == last){
+        case [{a: (a2,l2), e: e2, es: es2} as merge_with | es]:
+          if(a2 == e1){
             // merge and stop going deeper
-            {some: [{e: e, ls: [first | others] ++ ls} | es ]}
+            {some: [{e: e2, a: a1, es: es1 ++ [(a2, l2) | es2]} | es ]}
           }else{
-            match(merge_last(first, last, others, es)){
+            match(merge_last(merge_this, es)){
               case {none}: {none}
               case {some: rlist}:
-                {some: [a | rlist]}
+                {some: [merge_with | rlist]}
             }
           }
-        default: @fail("this list is not allowed to be empty");
       }
     }
 
-    recursive merge = function(list(edgelist) edges){
-      match(edges){
-        case [{e: last,ls: [first | ls]} as es | ess]:
+    recursive merge = function(list(edges) es){
+      match(es){
+        case []: []
+        case [{e: e, a: (a,_), es: _} as edgelist | ess]:
           // [A, ..., B] | [[X, ...,Z], ...]
-          if(List.contains(last, special_nodes)){
-            if(List.contains(first, special_nodes)){
+          if(List.contains(e, special_nodes)){
+            // last node is special
+            if(List.contains(a, special_nodes)){
               // both first and last node are special, we can't further merge this list
-              [es | merge(ess)]
+              [edgelist | merge(ess)]
             }else{
               // only the last node is special, try to merge the first one
-              match(merge_first(first, last, ls, ess)){
+              match(merge_first(edgelist, ess)){
                 case {none}:
-                  // no merge possible any more
-                  [es | merge(ess)]
+                  [edgelist | merge(ess)]
                 case {some: new_ess}:
                   merge(new_ess);
               }
             }
           }else{
             // last node isn't special, try to merge this one
-            match(merge_last(first, last, ls, ess)){
+            match(merge_last(edgelist, ess)){
               case {some: new_ess}:
                 merge(new_ess);
               case {none}:
                 // no merge possible for the last, check if possible for the first
-                if(List.contains(first, special_nodes)){
-                  // can't further merge this
-                  [es | merge(ess)]
+                if(List.contains(a, special_nodes)){
+                  // can't further merge this edgelist
+                  [edgelist | merge(ess)]
                 }else{
-                  match(merge_first(first, last, ls, ess)){
+                  match(merge_first(edgelist, ess)){
                     case {none}:
                       // no merge possible any more
-                      [es | merge(ess)]
+                      [edgelist | merge(ess)]
                     case {some: new_ess}:
                       merge(new_ess);
                   }
                 }
             }
           }
-        case []: []
-        default: @fail("not allowed: {edges}")
       }
     }
 
     merge(working_list);
   }
 
-  function option(list(string)) find_post(list(string) starts, list(string) searchlist){
+  function option(list(string)) find_post(list(string) starts, list((string,string)) searchlist){
     if(List.is_empty(starts)){
       {none}
     }else{
       match(searchlist){
         case []: {none}
-        case [a | bs]:
+        case [(a,_) | bs]:
           if(List.contains(a, starts)){
-            {some: [a | bs]}
+            {some: [a | List.map(function((x,_)){x},bs)]}
           }else{
             find_post(starts, bs);
           }
@@ -129,15 +127,19 @@ module Graph {
   }
 
   /* returns the found nodes in the wrong direction because of performance issues.
-    if you want the right direction, reverse the result list */
-  function option(list(string)) find_pre(list(string) starts, list(string) searchlist){
+    if you want them in the right direction, reverse the result list */
+  function option(list(string)) find_pre(list(string) starts, string last ,list((string,string)) searchlist){
     if(List.is_empty(starts)){
       {none}
     }else{
       match(searchlist){
-        case []: {none}
-        case [a | bs]:
-          match(find_pre(starts, bs)){
+        case []: if(List.contains(last, starts)){
+          {some: [last]}
+        }else{
+          {none}
+        }
+        case [(a,_) | bs]:
+          match(find_pre(starts, last, bs)){
             case {none}:
               if(List.contains(a, starts)){
                 {some: [a]}
@@ -151,50 +153,72 @@ module Graph {
     }
   }
 
-  // returns:
-  // (additional starts that should be tested again when
-  //  returning from the recursive call,
-  //  the nodes that were found in the meantime)
-  function (list(string), list(string)) find_helper(find_function, get_start, list(string) starts, list(edgelist) nodes){
-    match(nodes){
+  function(list(string), list(string)) find_post_helper(list(string) starts, list(edges) edgess){
+    match(edgess){
       case []:
         ([],[])
-      case [n | ns]:
-        (matches, new_starts) = match(find_function(starts, n.ls)){
+      case [e | es]:
+        (matches, new_starts) = match(find_post(starts, [e.a | e.es])){
           case {none}:
             ([],[])
           case {some: s}:
-            // add the last item to the starts list
+            // add a new item to the starts list
             // TODO would a insert only if not inside yet improve performance for the starts list?
-            (s, [get_start(n)])
+            ([e.e | s], [e.a.f1])
         }
-        (starts_again, recursive_matches) = find_helper(find_function, get_start, new_starts ++ starts, ns);
+        (starts_again, recursive_matches) = find_post_helper(new_starts ++ starts, es);
 
         // maybe there are new possible starts, so search again for them
-        (new_matches, all_starts_again) = match(find_function(starts_again, n.ls)){
+        (new_matches, all_starts_again) = match(find_post(starts_again, [e.a | e.es])){
           case {none}:
             // we're ready finally, the new starts found no new matches
             ([],new_starts ++ starts_again)
           case {some: s}:
-            (s, [get_start(n) | new_starts ++ starts_again])
+            ([e.e | s], [e.a.f1 | new_starts ++ starts_again])
+        }
+        (all_starts_again, new_matches ++ matches ++ recursive_matches)
+    }
+
+  }
+
+  // returns:
+  // (additional starts that should be tested again when
+  //  returning from the recursive call,
+  //  the nodes that were found in the meantime)
+  // post: true if all nodes after one
+  function (list(string), list(string)) find_pre_helper(list(string) starts, list(edges) edgess){
+    match(edgess){
+      case []:
+        ([],[])
+      case [e | es]:
+        (matches, new_starts) = match(find_pre(starts,e.e, [e.a | e.es])){
+          case {none}:
+            ([],[])
+          case {some: s}:
+            // add a new item to the starts list
+            // TODO would a insert only if not inside yet improve performance for the starts list?
+            (s, [e.e])
+        }
+        (starts_again, recursive_matches) = find_pre_helper(new_starts ++ starts, es);
+
+        // maybe there are new possible starts, so search again for them
+        (new_matches, all_starts_again) = match(find_pre(starts_again,e.e, [e.a | e.es])){
+          case {none}:
+            // we're ready finally, the new starts found no new matches
+            ([],new_starts ++ starts_again)
+          case {some: s}:
+            (s, [e.e | new_starts ++ starts_again])
         }
         (all_starts_again, new_matches ++ matches ++ recursive_matches)
     }
   }
 
-  function list(string) find_posts(list(string) starts, list(edgelist) nodes){
-    find_helper(find_post,function(n){
-      n.e
-    }, starts, nodes).f2;
+  function list(string) find_posts(list(string) starts, list(edges) edgess){
+    find_post_helper(starts, edgess).f2;
   }
 
-  function list(string) find_pres(list(string) starts, list(edgelist) nodes){
-    find_helper(find_pre,function(n){
-      match(n.ls){
-        case []: @fail("this list is never empty");
-        case [l | _]: l
-      }
-    }, starts, nodes).f2
+  function list(string) find_pres(list(string) starts, list(edges) edgess){
+    find_pre_helper(starts, edgess).f2;
   }
 
   function option(graph) collapse(state st, string id){
