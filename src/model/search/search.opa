@@ -24,12 +24,8 @@ module Search {
     stringmap(call) calls = Database.get_id_map(id);
     list(string) nodes = Database.get_call_ids(id);
     // TODO only do this if there is a search criteria that requires it
-    g = match(Database.get_cfg(id)){
-      case {none}:
-        @fail("No graph found");
-      case {some: g}:
-        Graph.build(g.edges);
-    }
+    gr = Database.get_cfg(id);
+    g = Graph.build(gr.edges);
     Log.debug("Search","struct graph \n{g}");
     // wtf: this void is necessary for the compiler...
     void

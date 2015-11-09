@@ -21,11 +21,11 @@ module Site {
   }
 
   /* is called async from the server after the command to do an analysis has finished. */
-  client function analysis_finished(string id, string message, option(string) error) {
+  client function analysis_finished(result, string message) {
     Log.debug("view","analysis finished");
 
-    match(error){
-      case {none}:
+    match(result){
+      case {success: id}:
         Dom.set_attribute_unsafe(#tabs, "ana-id", id);
 
         Dom.remove_class(#cfg-tab-parent, "disabled");
@@ -35,8 +35,8 @@ module Site {
         Src.reload(id);
 
         show_message(String.replace("\n", "<br/>", message), false);
-      case {some: str}:
-        show_message(message ^ "<br/>" ^ str, true);
+      case {error: msg}:
+        show_message(message ^ "<br/>" ^ msg, true);
     }
   }
 

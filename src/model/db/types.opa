@@ -36,8 +36,7 @@ type edges = {
 type ana = {
   string id,
   string filename,
-  option(graph) cfg,
-  option(string) dotfile,
+  graph cfg,
   run run
 }
 

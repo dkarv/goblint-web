@@ -7,10 +7,6 @@ module Database {
     FileUtils.read(/anas/all[{id: id}]/filename);
   }
 
-  exposed function get_dotfile(id){
-    /anas/all[{id: id}]/dotfile;
-  }
-
   exposed function get_cfg(id){
     /anas/all[{id: id}]/cfg;
   }
@@ -49,5 +45,13 @@ module Database {
 
   function save_filename(string id, string filename){
     /anas/all[{id: id}]/filename <- filename;
+  }
+
+  function save_graph(string id, graph g){
+    /anas/all[{id: id}]/cfg <- g;
+  }
+
+  function save_run(string id, run r){
+    /anas/all[~{id}]/run <- r;
   }
 }

@@ -221,14 +221,9 @@ module Graph {
     find_pre_helper(starts, edgess).f2;
   }
 
-  function option(graph) collapse(state st, string id){
+  function graph collapse(state st, string id){
     g = Database.get_cfg(id);
-    match(g){
-      case {none}:
-        {none}
-      case {some: gr}:
-        {some: collapse_graph(gr, st)};
-    }
+    collapse_graph(g, st);
   }
 
   private function graph collapse_graph(graph g, state st){

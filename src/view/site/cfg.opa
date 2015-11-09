@@ -5,13 +5,9 @@ module Cfg{
       case {none}:
         Log.error("cfg", "analysis not finished yet");
       case {some: id}:
-        match(Database.get_cfg(id)){
-          case {none}:
-            Log.error("Cfg","No cfg found");
-          case {some: g}:
-            Tab.show(#cfg-tab);
-            load(id, g);
-        }
+        g = Database.get_cfg(id);
+        Tab.show(#cfg-tab);
+        load(id, g);
         // set the arguments
         Site.load_arguments(id);
     }
@@ -28,18 +24,14 @@ module Cfg{
   client function reload(string id){
     dom parent = Dom.select_id("cfg-tab-parent");
     if(Dom.has_class(parent, "active")){
-      match(Database.get_cfg(id)){
-        case {none}:
-          Log.error("Cfg","No cfg found");
-        case {some: g}:
-          load(id, g);
-          string line_str = Dom.get_attribute_unsafe(#loc2-container, "data-line");
-          Log.debug("Src", "try to show line: {line_str}");
-          if(String.is_empty(line_str) == {false}){
-            c = Database.get_call_by_id(id, line_str);
-            list(analysis) globs = Database.get_globs(id);
-            Site.set_information(#loc2-container, c, globs, line_str);
-          }
+      g = Database.get_cfg(id);
+      load(id, g);
+      string line_str = Dom.get_attribute_unsafe(#loc2-container, "data-line");
+      Log.debug("Src", "try to show line: {line_str}");
+      if(String.is_empty(line_str) == {false}){
+        c = Database.get_call_by_id(id, line_str);
+        list(analysis) globs = Database.get_globs(id);
+        Site.set_information(#loc2-container, c, globs, line_str);
       }
     }
   }
@@ -67,14 +59,8 @@ module Cfg{
     }
     match(Site.get_analysis_id()){
       case {some: id}:
-        option(graph) g = Graph.collapse(collapse_level, id);
-        match(g){
-          case {none}:
-            Log.error("Cfg","There was an error: collapsing not possible");
-          case {some: g}:
-            Log.debug("Cfg","collapsed graph: {g}");
-            %%DotRenderer.draw%%(g, callback);
-        }
+        graph g = Graph.collapse(collapse_level, id);
+        %%DotRenderer.draw%%(g, callback);
       case {none}:
         Log.error("Cfg","no analysis id found");
     }

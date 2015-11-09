@@ -45,10 +45,10 @@ module Tests {
 
   function list(string) test_file(string file){
     args = Arguments.get_defaults({some: file});
-    Model.process_file(function(id, stdout, msg){
-      match(msg){
-        case {some: m}:
-          Log.warning("parse_test","fail: {file}:\n{m}\n{stdout}\n");
+    Model.process_file(function(result, stdout){
+      match(result){
+        case {error: msg}:
+          Log.warning("parse_test","fail: {file}:\n{msg}\n{stdout}\n");
           Log.debug("arguments:","{args}");
           if( Option.is_some(List.index(file, expected_fails)) ){
             Log.debug("Test","expected fail: {file}");
@@ -56,7 +56,7 @@ module Tests {
           }else{
             [file];
           };
-        case {none}:
+        case {success: id}:
           match(Cmd.opentests()){
             case {none}: void
             case {some: browser}:
