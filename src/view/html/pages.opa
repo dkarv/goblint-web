@@ -194,7 +194,7 @@ module Pages {
               {tr("x=int", "x has exact value int")}
               {tr("x&lt;int","x smaller than int")}
               {tr("x&gt;int","x bigger than int")}
-              {tr("x[int_1;int_2]","x &gt;= int_1 and x &lt;=int_2")}
+              {tr("x[int_1;int_2]","x >= int_1 and x <=int_2")}
             </table>
             <h4>Some special commands:</h4>
             <table>
