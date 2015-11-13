@@ -13,7 +13,7 @@ type expr =
   {unreachables} or
   /** this | that */
   {expr e1, expr e2, binop bi} or
-  /** !(not), =>(nodes), <=(nodes)*/
+  /** !(not), >(nodes), <(nodes)*/
   {expr e, unop un}
 
 
@@ -24,9 +24,6 @@ module Search {
     stringmap(call) calls = Database.get_id_map(id);
     list(string) nodes = Database.get_call_ids(id);
     // TODO only do this if there is a search criteria that requires it
-    gr = Database.get_cfg(id);
-    g = Graph.build(gr.edges);
-    Log.debug("Search","struct graph \n{g}");
     // wtf: this void is necessary for the compiler...
     void
 
@@ -51,9 +48,9 @@ module Search {
             };
           }, nodes);
         case {e: e, un: {post_}}:
-          Graph.find_posts(inner(e), g);
+          Graph.find_posts(inner(e), Database.get_cfg(id));
         case {e: e, un: {pre_}}:
-          Graph.find_pres(inner(e), g);
+          Graph.find_pres(inner(e), Database.get_start_nodes(id), Database.get_cfg(id));
         // AND: e1 & e2
         case {~e1, ~e2, bi: {and_}}:
           list(string) res_e1 = inner(e1);

@@ -54,7 +54,8 @@ module Cfg{
     val = Dom.get_value(#collapse-sel);
     collapse_level = match(val){
       case "none": {none};
-      case "one": {one};
+      case "inout1": {inout1};
+      case "allloops": {loops: 2};
       default: {none};
     }
     match(Site.get_analysis_id()){

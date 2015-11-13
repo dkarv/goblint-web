@@ -11,6 +11,10 @@ module Database {
     /anas/all[{id: id}]/cfg;
   }
 
+  exposed function get_start_nodes(id){
+    /anas/all[{id: id}]/start_nodes;
+  }
+
   exposed function option(call) get_call_by_line(string id, int line) {
     ?/anas/all[id == id]/run/line_calls[line];
   }
@@ -47,8 +51,9 @@ module Database {
     /anas/all[{id: id}]/filename <- filename;
   }
 
-  function save_graph(string id, graph g){
+  function save_graph(string id, list(string) start_nodes, graph g){
     /anas/all[{id: id}]/cfg <- g;
+    /anas/all[{id: id}]/start_nodes <- start_nodes;
   }
 
   function save_run(string id, run r){

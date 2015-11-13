@@ -168,7 +168,8 @@ module Pages {
         <div id=#cfg-container class="right">
           <select id=#collapse-sel onchange={Cfg.collapse_change} class="form-control">
             <option value="none">Don't collapse</option>
-            <option value="one">Simple collapse</option>
+            <option value="inout1">In- and outgoing edges</option>
+            <option value="allloops">Collapse loops</option>
           </select>
           <div class="input-group">
             <input type="text" class="form-control"

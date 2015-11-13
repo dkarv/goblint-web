@@ -1,5 +1,3 @@
-type either('a, 'b) = {'a this} or {'b that}
-
 type maybe('a) = {'a success} or {string error}
 
 module Model {
@@ -10,7 +8,7 @@ module Model {
       case ~{error}:
         // report error message
         ~{error}
-      case {success: g}:
+      case {success: (starts, g)}:
         match(parse_result()){
           case ~{error}:
             // report error message
@@ -19,7 +17,7 @@ module Model {
             // no error, save everything to the database
             string random = Random.string(16);
             Database.save_filename(random, file);
-            Database.save_graph(random, g);
+            Database.save_graph(random, starts, g);
             Database.save_run(random, res);
             // return no error
             {success: random}
@@ -81,13 +79,13 @@ module Model {
   }
 
   /** returns an error message if there was some error */
-  private function maybe(graph) parse_cfg(string file){
+  private function maybe((list(string), graph)) parse_cfg(string file){
     string cfg_folder = Uri.encode_string(file);
     // TODO do not only parse main.dot but also the other methods
     string dot_file = "cfgs/" ^ cfg_folder ^ "/main.dot";
     if(File.exists(dot_file)){
       string s = FileUtils.read(dot_file);
-      option(graph) result = GraphParser.parse_graph(s);
+      result = GraphParser.parse_graph(s);
       match(result){
         case {some: g}:
           {success: g};

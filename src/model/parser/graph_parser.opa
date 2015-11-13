@@ -1,7 +1,14 @@
 module GraphParser {
   // parser for dot syntax. produces a graph
-  function parse_graph(str){
-    Parser.try_parse( graph_parser,str);
+  function option((list(string),graph)) parse_graph(str){
+    // parse the edges and vertices
+    match(Parser.try_parse( graph_parser,str)){
+      case {none}: {none}
+      case {some: gr}:
+        // convert to internal data structure
+        // TODO keep vertex shape
+        {some: Graph.build(gr.edges)}
+    }
   }
 
   private function string decode_html(string str){

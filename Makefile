@@ -38,6 +38,6 @@ test: exe
 	$(RUN_CMD) $(RUN_OPT) --testfile "../analyzer/tests/regression/"
 
 debug: exe
-	$(RUN_CMD) $(RUN_OPT) --testfile $(file) --opentests "google-chrome"
+	$(RUN_CMD) $(RUN_OPT) --testfile $(file) #--opentests "google-chrome"
 
 include Makefile.common

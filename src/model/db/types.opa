@@ -2,41 +2,31 @@
  * contains the most important types.
  * the main advantage is, that you can import them without a big overhead.
  */
-type vertex = {
-  string id,
-  string shape,
-  string label
-}
-
-type edge = {
-  string start,
-  string end,
-  string label
-}
-/**
- * internal representation of a graph.
- */
-type graph = {
-  list(edge) edges,
-  list(vertex) vertices
-}
+// (id, label)
+type node = (string, string)
 
 /*
  * representation of a list of edges.
- * the tupels represent (nodes, outgoing label)
  * e is the last node of the edges
  * a is the first one, together with the first label
  */
 type edges = {
-  (string, string) a,
+  node a,
   string e,
-  list((string, string)) es
+  list(node) es
 }
+
+/**
+ * internal representation of a graph.
+ * list of list of edges basically
+ */
+type graph = multimap(string, edges, String.order)
 
 type ana = {
   string id,
   string filename,
   graph cfg,
+  list(string) start_nodes,
   run run
 }
 

@@ -1,24 +1,48 @@
 /** @opaType graph */
 /** @opaType list('a) */
-var g;
+var graph;
 var listener;
 /**
  * @register {graph, (string -> void)-> void}
  */
 function draw(cfg, click) {
     console.log(cfg);
-    g = new dagreD3.graphlib.Graph({multigraph: true}).setGraph({});
-    iter(cfg.vertices, function (elem) {
-        g.setNode(elem.id, {});
-    });
-    iter(cfg.edges, function (edge) {
-        g.setEdge(edge.start, edge.end, {label: edge.label},Math.random().toString(36).substr(2, 5));
-    });
+    graph = new dagreD3.graphlib.Graph({multigraph: true}).setGraph({});
 
-    console.log(g);
+    map_iter(cfg, function (k, e) {
+        iter(e, add_edges);
+    });
 
     listener = click;
-    render(g, ".cfg");
+    render(graph, ".cfg");
+
+    // undo zoom and translation... TODO this does not work yet
+    // d3.behavior.zoom().x(1).y(1);
+    // var svg = d3.select(".cfg");
+    // var svgGroup = svg.select("g");
+    // svgGroup.attr("transform", "none");
+}
+
+function add_edges(e) {
+    var es = e.es;
+
+    var a = e.a.f1;
+    var b;
+    var lbl = e.a.f2;
+    graph.setNode(a, {});
+    while (!es.hasOwnProperty('nil')) {
+        // add new node & edge
+        b = es.hd.f1;
+        graph.setNode(b, {});
+        graph.setEdge(a, b, {label: lbl}, Math.random().toString(36).substr(2, 5));
+        a = b;
+        lbl = es.hd.f2;
+        es = es.tl;
+    }
+
+    b = e.e;
+    graph.setNode(b, {});
+    graph.setEdge(a, b, {label: lbl}, Math.random().toString(36).substr(2, 5));
 }
 
 /**
@@ -28,14 +52,14 @@ function highlight(highlights) {
     console.log(highlights);
     unhighlight();
     iter(highlights, function (elem) {
-        g.setNode(elem, {style: "fill: green"});
+        graph.setNode(elem, {style: "fill: green"});
     });
-    render(g, ".cfg");
+    render(graph, ".cfg");
 }
 
 function unhighlight() {
-    g.nodes().forEach(function (n) {
-        g.setNode(n, {style: "fill: white"})
+    graph.nodes().forEach(function (n) {
+        graph.setNode(n, {style: "fill: white"})
     });
 }
 
@@ -44,7 +68,7 @@ function render(g, target) {
     var svg = d3.select(target);
     var svgGroup = svg.select("g");
 
-    render(svgGroup, g);
+    render(svgGroup, graph);
     // $('svg').width(g.graph().width).height(g.graph().height);
     svg.call(d3.behavior.zoom().on('zoom', function () {
         var ev = d3.event;
@@ -54,6 +78,14 @@ function render(g, target) {
     // create a listener
     svgGroup.selectAll("g.node")
         .on('click', listener);
+}
+
+function map_iter(map, f) {
+    if (!map.hasOwnProperty('empty')) {
+        f(map.key, map.value);
+        map_iter(map.left, f);
+        map_iter(map.right, f);
+    }
 }
 
 /**
