@@ -1,6 +1,3 @@
-// different collapse options
-type state = {none} or {inout1} or {int loops}
-
 type raw_vertex = {
   string id,
   string shape,
@@ -368,26 +365,6 @@ module Graph {
       val = String.of_list(function(x){ x }, ",", Set.To.list(v))
       k ^ " -> [{val}]"
     }, "\n", Map.To.assoc_list(map));
-  }
-
-  function graph collapse(state st, string id){
-    g = Database.get_cfg(id);
-    collapse_graph(g, st);
-  }
-
-  private function graph collapse_graph(graph g, state st){
-    match(st){
-      case {none}: g
-      case {inout1}:
-        Map.map(List.map(collapse_to_single, _), g);
-      case {loops: x}: g
-        // TODO fix this
-        /*if(x == 0){
-          collapse_loops(g);
-        }else{
-          collapse_loops(collapse_graph(g, {loops: x - 1}));
-        }*/
-    }
   }
 
   private function count(option((string, int)) last, ls){

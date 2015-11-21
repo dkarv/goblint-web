@@ -8,7 +8,7 @@ PWD ?= $(shell pwd)
 # 7: debug, but not info
 # 6: default, no debug
 RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "$(PWD)"
-OTHER_DEPENDS = resources/*
+OTHER_DEPENDS = resources/* src
 CONFIG = --conf opa.conf --conf-opa-files
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
 
@@ -32,25 +32,23 @@ default: exe
 $(BUILDDIR)/%.opp: plugins/%.js
 	opa-plugin-builder --js-validator-off $^ --build-dir $(BUILDDIR) -o $(@F)
 
-js_plugins: PLUGINS
+js_plugins: $(PLUGINS)
 
 # Different run definitions: run, debug, test
 run: exe
-	$(RUN_CMD) $(RUN_OPT)
+	$(RUN_CMD) $(RUN_OPT) || true
 
 test: exe
-	$(RUN_CMD) $(RUN_OPT) --testfile "../analyzer/tests/regression/"
+	$(RUN_CMD) $(RUN_OPT) --testfile "../analyzer/tests/regression/" || true
 
 debug: exe
-	$(RUN_CMD) $(RUN_OPT) --testfile $(file) #--opentests "google-chrome"
+	$(RUN_CMD) $(RUN_OPT) --testfile $(file) || true #--opentests "google-chrome"
 
-########################################
-# MAIN RULE
 exe: $(EXE)
 
 ########################################
 # EXECUTABLE BUILDING
-$(EXE) : $(OTHER_DEPENDS) $(PLUGINS)
+$(EXE): $(OTHER_DEPENDS) $(PLUGINS)
 	@echo "### Building executable $(EXE) "
 	$(OPA) $(CONFIG) $(PLUGINS) -o $@ --build-dir $(BUILDDIR)/$(EXE)
 
