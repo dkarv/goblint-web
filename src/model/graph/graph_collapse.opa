@@ -12,13 +12,45 @@ module GraphCollapse {
       case {none}: g
       case {inout1}:
         Map.map(List.map(collapse_to_single, _), g);
-      case {loops: x}: g
-        // TODO fix this
-        /*if(x == 0){
+      case {loops: x}:
+        if(x == 0){
           collapse_loops(g);
-        }else{
-          collapse_loops(collapse_graph(g, {loops: x - 1}));
-        }*/
+        } else {
+          if(x > 0) {
+            // TODO merge the edges
+            collapse_graph(remove_loops(g), {loops: x-1});
+          } else {
+            @fail("Can't use loop with negative number!");
+          }
+        }
     }
+  }
+
+  private function edges collapse_to_single({a: (a,l), ~e, ~es}){
+      lbls = [l | List.map(function((_,l)){ l }, es)];
+      lbl = String.concat("\n", lbls);
+      {a: (a, lbl), e: e, es: []}
+  }
+
+  private function graph collapse_loops(graph g){
+    Map.map(function(val){
+      List.map(function(x){
+        if(x.e == x.a.f1){
+          collapse_to_single(x);
+        } else {
+          x
+        }
+      }, val);
+    }, g);
+  }
+  /**
+   * remove loops instead of collapsing
+   */
+  private function graph remove_loops(graph g){
+    Map.map(function(val){
+      List.filter(function(x){
+        x.e != x.a.f1
+      }, val);
+    }, g);
   }
 }

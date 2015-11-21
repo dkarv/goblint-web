@@ -8,7 +8,7 @@ PWD ?= $(shell pwd)
 # 7: debug, but not info
 # 6: default, no debug
 RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "$(PWD)"
-OTHER_DEPENDS = resources/* src
+OTHER_DEPENDS = resources/*
 CONFIG = --conf opa.conf --conf-opa-files
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
 
@@ -20,16 +20,18 @@ endif
 
 ########################################
 # MAKEFILE VARIABLES
-OPACOMPILER ?= opa
-OPA = $(OPACOMPILER) $(FLAG) $(OPAOPT)
+OPA = opa $(FLAG) $(OPAOPT)
 BUILDDIR ?= _build
 export BUILDDIR
-PLUGINS = $(patsubst %, $(BUILDDIR)/%.opp, $(basename $(notdir $(wildcard plugins/*.js))))
+# PLUGINS = $(patsubst %, $(BUILDDIR)/%.opp, $(basename $(notdir $(wildcard plugins/*.js))))
+PLUGINS = $(BUILDDIR)/dotrenderer.opp $(BUILDDIR)/util.opp $(BUILDDIR)/prettify.opp
 
 default: exe
 
 # compile the plugins
 $(BUILDDIR)/%.opp: plugins/%.js
+# TODO hack: remove all opx to ensure the .opp files are not cached
+	rm -rf $(wildcard $(BUILDDIR)/*.opx)
 	opa-plugin-builder --js-validator-off $^ --build-dir $(BUILDDIR) -o $(@F)
 
 js_plugins: $(PLUGINS)
@@ -46,10 +48,12 @@ debug: exe
 
 exe: $(EXE)
 
+pack:
+
 ########################################
 # EXECUTABLE BUILDING
-$(EXE): $(OTHER_DEPENDS) $(PLUGINS)
-	@echo "### Building executable $(EXE) "
+$(EXE): pack $(PLUGINS)
+	@echo "### Building executable $(EXE)"
 	$(OPA) $(CONFIG) $(PLUGINS) -o $@ --build-dir $(BUILDDIR)/$(EXE)
 
 $(EXE:%.exe=%.run) : $(EXE)

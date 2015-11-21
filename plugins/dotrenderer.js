@@ -6,7 +6,8 @@ var listener;
  * @register {graph, (string -> void)-> void}
  */
 function draw(cfg, click) {
-    console.log(cfg);
+    console.log("Test - 3");
+    // console.log(cfg);
     graph = new dagreD3.graphlib.Graph({multigraph: true}).setGraph({});
 
     map_iter(cfg, function (k, e) {

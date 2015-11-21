@@ -55,12 +55,12 @@ module Cfg{
     collapse_level = match(val){
       case "none": {none};
       case "inout1": {inout1};
-      case "allloops": {loops: 2};
+      case "allloops": {loops: 0};
       default: {none};
     }
     match(Site.get_analysis_id()){
       case {some: id}:
-        graph g = Graph.collapse(collapse_level, id);
+        graph g = GraphCollapse.collapse(collapse_level, id);
         %%DotRenderer.draw%%(g, callback);
       case {none}:
         Log.error("Cfg","no analysis id found");

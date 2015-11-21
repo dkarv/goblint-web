@@ -21,7 +21,7 @@ module Graph {
   function (list(string), graph) build(list(raw_edge) edges){
     cnt = List.fold(counter, edges, Map.empty);
 
-    start_nodes = Map.To.key_list(Map.filter(function(_, (in,out)){
+    start_nodes = Map.To.key_list(Map.filter(function(_, (in,_)){
       in == 0;
     }, cnt));
 
@@ -117,7 +117,7 @@ module Graph {
 
   function test2(result, elist){
     List.fold(function(elem, acc){
-      test = Map.exists(function(key, val){
+      test = Map.exists(function(_, val){
         List.exists(function(e){
           e.a.f1 == elem || e.e == elem ||
           (List.exists(function(e){
@@ -211,7 +211,7 @@ module Graph {
     Log.debug("Result:","\n{print(predominators)}");
 
     // search for starts
-    (found_starts, found_items) = Multimap.fold(function(key, {e: e, a: (a,l), es: es}, (st, it)){
+    (found_starts, found_items) = Multimap.fold(function(_, {e: e, a: (a,_), es: es}, (st, it)){
       st = if(List.contains(e, starts)){
         [e | st];
       }else{ st }
@@ -240,7 +240,7 @@ module Graph {
       match(Multimap.get(e, g)){
         case []: acc
         case [x]: [e | map_snd(x.es) ++ acc]
-        case [x, y | xs]: [e | acc]
+        default: [e | acc]
       }
     }, extend_these, []);
 
@@ -388,29 +388,6 @@ module Graph {
     }else{
       {none}
     }
-  }
-
-  private function edges collapse_to_single({a: (a,l), ~e, ~es}){
-      lbls = [l | List.map(function((_,l)){ l }, es)];
-      lbl = String.concat("\n", lbls);
-      {a: (a, lbl), e: e, es: []}
-  }
-
-  private function graph collapse_loops(graph g){
-    // TODO change g from list to map
-    // TODO redo this stuff
-    // to support loop collapsing for numbers bigger than 0, we need to remove the edges and not map them to a single one
-    /*without_loops = List.map(function(e){
-      if(e.e == e.a.f1){
-        collapse_to_single(e);
-      }else{
-        e;
-      }
-    }, g);
-    // now merge two lists A and B iff A is the only one that starts at x and B is the only one that ends at x
-    // this is more simple with a map, we need a map
-    without_loops;*/
-    g;
   }
 
   private function stringmap((int, int)) counter(v, acc){
