@@ -15,6 +15,7 @@ function draw(cfg, click) {
 
     listener = click;
     render(graph, ".cfg");
+    console.log("TEST 0");
 
     // undo zoom and translation... TODO this does not work yet
     // d3.behavior.zoom().x(1).y(1);
