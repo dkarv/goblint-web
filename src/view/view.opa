@@ -2,6 +2,7 @@ module View {
 
   /** display the whole page. upload tab is active */
   function show_root() {
+    // show Upload page + TODO last n analysis'
     html =
       <div id=#content>
         {Pages.menu({upload}, [{upload}, {src}, {cfg}],[{src}, {cfg}])}

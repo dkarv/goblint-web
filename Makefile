@@ -30,7 +30,7 @@ default: exe
 
 # compile the plugins
 $(BUILDDIR)/%.opp: plugins/%.js
-# TODO hack: remove all opx to ensure the .opp files are not cached
+# hack: remove all opx to ensure the .opp files are not cached
 	rm -rf $(wildcard $(BUILDDIR)/*.opx)
 	opa-plugin-builder --js-validator-off $^ --build-dir $(BUILDDIR) -o $(@F)
 

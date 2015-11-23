@@ -18,7 +18,7 @@ function draw(cfg, click) {
     render(graph, ".cfg");
     console.log("TEST 0");
 
-    // undo zoom and translation... TODO this does not work yet
+    // TODO undo zoom and translation does not work yet
     // d3.behavior.zoom().x(1).y(1);
     // var svg = d3.select(".cfg");
     // var svgGroup = svg.select("g");

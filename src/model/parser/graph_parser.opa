@@ -7,6 +7,7 @@ module GraphParser {
       case {some: gr}:
         // convert to internal data structure
         // TODO keep vertex shape
+        // but vertex shape is not really usefull right now
         {some: Graph.build(gr.edges)}
     }
   }

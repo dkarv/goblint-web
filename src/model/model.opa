@@ -15,6 +15,7 @@ module Model {
             ~{error}
           case {success: res}:
             // no error, save everything to the database
+            // TODO add timestamp -> able to show the last n analysis
             string random = Random.string(16);
             Database.save_filename(random, file);
             Database.save_graph(random, starts, g);
@@ -30,7 +31,8 @@ module Model {
   /** 1. option to trigger an analysis: upload a file */
   function upload_analysis(callback, list((string, arg)) args, form_data) {
     Map.iter(function(_, val) {
-      // save the file in a subdirectory TODO add timestamp / any other identification
+      // save the file in a subdirectory
+      // TODO add timestamp / any other identification
       string file = "input/" ^ val.filename;
       FileUtils.write(file, val.content);
       process_file(callback, file, args);
@@ -81,16 +83,12 @@ module Model {
   /** returns an error message if there was some error */
   private function maybe((list(string), graph)) parse_cfg(string file){
     string cfg_folder = "cfgs/" ^ Uri.encode_string(file) ^ "/";
-    // TODO do not only parse main.dot but also the other methods
-    // string dot_file = cfg_folder ^ "/main.dot";
     if(File.exists(cfg_folder)){
       List.fold(function(x, acc){
         match(x){
           case {dir: _}: acc
           case {file: f}:
-            Log.debug("Model", "reading " ^ f);
             dot = FileUtils.read(cfg_folder ^ f);
-            Log.debug("Model", "{dot}");
             result = GraphParser.parse_graph(dot);
             match(result){
               case {some: (ss, gs)}:

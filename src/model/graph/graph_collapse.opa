@@ -17,7 +17,7 @@ module GraphCollapse {
           collapse_loops(g);
         } else {
           if(x > 0) {
-            // TODO merge the edges
+            // TODO merge the edges. this is necessary for the recursive calls to find new loops
             collapse_graph(remove_loops(g), {loops: x-1});
           } else {
             @fail("Can't use loop with negative number!");

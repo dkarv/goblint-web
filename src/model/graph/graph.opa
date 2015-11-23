@@ -90,8 +90,6 @@ module Graph {
         };
       }
     }, ess, Multimap.set(node, [], mm));
-    // TODO it should be possible to refactor this algorithm to get rid of
-    // removing and adding the edges again later
   }
 
   function print_edges(bool labels, edges e){
@@ -153,7 +151,7 @@ module Graph {
 
     new_results = results ++ add_rec(Set.empty, new_starts, g);
 
-    // TODO use a set so no unique is necessary
+    // TODO use a set for search results so no unique is necessary
     List.unique_list_of(new_results);
   }
 

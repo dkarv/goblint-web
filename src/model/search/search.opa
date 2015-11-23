@@ -23,7 +23,6 @@ module Search {
     // Log.debug("Search","starting search");
     stringmap(call) calls = Database.get_id_map(id);
     list(string) nodes = Database.get_call_ids(id);
-    // TODO only do this if there is a search criteria that requires it
     // wtf: this void is necessary for the compiler...
     void
 
@@ -99,8 +98,7 @@ module Search {
   }
 
   private function list(string) satisfies((string -> bool) f, string searchVar, stringmap(call) calls){
-    // TODO some efficient data structure maybe?
-    // maybe it's also possible to do this in database queries
+    // TODO maybe it's also possible to do this in database queries
     Map.fold(function(key, val, acc){
       List.fold(function((_, paths), acc){
         List.fold(function(ana, acc){
