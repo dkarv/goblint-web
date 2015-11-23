@@ -2,7 +2,8 @@
  * contains the most important types.
  * the main advantage is, that you can import them without a big overhead.
  */
-// (id, label)
+
+// (id, label): label that targets the next node
 type node = (string, string)
 
 /*
@@ -48,8 +49,8 @@ type call = {
   string file,
   int line,
   int order,
-  list(analysis) context,
-  list(analysis) path
+  // list(context, path)
+  list((list(analysis), list(analysis))) anas
 }
 
 type warnitem = {

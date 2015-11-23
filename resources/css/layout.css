@@ -151,3 +151,7 @@ li.warn:before {
     padding: 0;
     padding-left: 5px;
 }
+
+.ctx .panel-heading {
+    padding: 5px 10px;
+}

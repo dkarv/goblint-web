@@ -41,28 +41,63 @@ module Site {
   }
 
   client function void set_information(dom target, option(call) c, list(analysis) globs, string line_id){
+    clickme = function (id, _){
+      Dom.remove_class(Dom.select_class("ctx"), "active");
+      Dom.add_class(Dom.select_id(id), "active");
+      Dom.remove_class(Dom.select_class("ctx-pill"), "active");
+      Dom.add_class(Dom.select_id("pill-{id}"), "active");
+    };
+
     res = match(c){
       case {none}: <h3>No information available</h3>
       case {some: cl}:
+        no_globs = List.is_empty(globs);
         <>
           <h3>{line_id}:</h3>
-          <h4>Context: </h4>
-          {Ana.print_analysis(cl.context)}
-          <h4>Path: </h4>
-          {Ana.print_analysis(cl.path)}
+          <ul class="nav nav-pills nav-justified">
+            {List.init(function(i){
+              id = "ctx{i}";
+              act = if(i==0){ "active" }else { "" };
+              <li
+                onclick={clickme(id, _)}
+                id="pill-{id}"
+                class="ctx-pill {act}"
+              ><a>{i + 1}</a></li>
+            }, List.length(cl.anas))}
+            {if(no_globs){
+              <></>
+            }else{
+              <li
+                id="pill-glob"
+                class="ctx-pill"
+                onclick={clickme("glob", _)}>
+                <a>Glob</a>
+              </li>
+            }}
+          </ul>
+          <div class="tab-content">
+            {List.mapi(function(i, (contexts, paths)){
+              act = if(i==0){ "active" }else{ "" };
+              <div id="ctx{i}" class="ctx tab-pane {act}">
+                <h4>Context: </h4>
+                  {Ana.print_analysis(contexts)}
+                <h4>Path: </h4>
+                  {Ana.print_analysis(paths)}
+              </div>
+            }, cl.anas);}
+            {if(no_globs){
+              <></>
+            } else {
+              <div id="glob" class="ctx tab-pane">
+                <h4>Globals: </h4>
+                {Ana.print_analysis(globs)}
+              </div>
+            }}
+          </div>
         </>
     }
 
-    glob = if(List.is_empty(globs)){
-      <h4>No Globs</h4>
-    }else{
-      <>
-        <h4>Globals: </h4>
-        {Ana.print_analysis(globs)}
-      </>
-    }
-
-    _ = Dom.put_inside(target, Dom.of_xhtml(<>{res}{glob}</>));
+    _ = Dom.put_inside(target, Dom.of_xhtml(res));
     void
   }
 

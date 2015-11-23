@@ -101,44 +101,44 @@ module Search {
   private function list(string) satisfies((string -> bool) f, string searchVar, stringmap(call) calls){
     // TODO some efficient data structure maybe?
     // maybe it's also possible to do this in database queries
-    Map.To.key_list(
-      Map.filter(function(_, val){
-        List.exists(function(el){
-          if(String.eq("base", el.name)){
-            match(el.val){
-              case ~{map}:
-                // search for the value domain in the map
-                match(Map.get("value domain", map)){
-                  case {none}:
-                    {false}
-                  case {some: s}:
-                    // ensure s is a map again:
-                    match(s){
-                      case {map: varMap}:
-                        // now search for the right variable
-                        match(Map.get(searchVar, varMap)){
-                          case {none}:
-                            {false}
-                          case {some: result}:
-                            match(result){
-                              case ~{data}:
-                                f(data);
-                              default:
-                                {false}
-                            }
-                        }
-                      default: {false}
+    Map.fold(function(key, val, acc){
+      List.fold(function((_, paths), acc){
+        List.fold(function(ana, acc){
+          if(String.eq("base", ana.name)){
+            if(satisfies_helper(f, searchVar, ana.val)){
+              [key | acc];
+            } else {
+              acc;
+            }
+          } else {
+            acc;
+          }
+        }, paths, acc);
+      }, val.anas, acc);
+    }, calls, []);
+  }
+
+  private function bool satisfies_helper((string -> bool) f, string searchVar, val){
+    match(val){
+      case ~{map}:
+        match(Map.get("value domain", map)){
+          case {none}: false
+          case {some: s}:
+            match(s){
+              case {map: varMap}:
+                match(Map.get(searchVar, varMap)){
+                  case {none}: false
+                  case {some: result}:
+                    match(result){
+                      case ~{data}: f(data);
+                      default: false;
                     }
                 }
-              default:
-                {false}
+              default: false;
             }
-          }else{
-            {false}
-          }
-        },val.path);
-      }, calls)
-    );
+        }
+      default: false;
+    }
   }
 
   server function option(expr) parse(string query) {

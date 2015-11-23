@@ -181,19 +181,19 @@ module ResultParser {
       default: @fail("can't find file in call");
     }
 
-    list(analysis) context =  match(find(ls, "context")){
-      case {some: {Record: r}}:
-        parse_list(find(r, "analysis"), parse_analysis);
-      default: []
-    }
+    list(list(analysis)) contexts =
+      parse_list(find(ls, "context"), parse_anas);
 
-    list(analysis) path =  match(find(ls, "path")){
-      case {some: {Record: r}}:
-        parse_list(find(r, "analysis"), parse_analysis);
-      default: []
-    }
+    list(list(analysis)) paths =
+          parse_list(find(ls, "path"), parse_anas);
 
-    ~{line, order, id, file, context, path}
+    anas = List.zip(contexts, paths);
+
+    ~{line, order, id, file, anas}
+  }
+
+  function list(analysis) parse_anas(list((string, RPC.Json.json)) ls){
+    parse_list(find(ls, "analysis"), parse_analysis);
   }
 
   function list((string, analysis)) parse_glob(list((string, RPC.Json.json)) ls){
@@ -310,7 +310,7 @@ module ResultParser {
 
       list(string) unreachables = Map.To.key_list(
         Map.filter(function(_, call){
-          List.is_empty(call.path)
+          List.is_empty(call.anas)
         },id_calls)
       );
 
