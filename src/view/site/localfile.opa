@@ -11,7 +11,7 @@ module LocalFile {
   }
 
   client function display(string path){
-    ls = FileUtils.ls(path);
+    ls = FileUtils.sorted_ls(path);
     Dom.remove_content(#file-selector);
     htm = List.fold(function(elem, acc){
       e = match(elem){

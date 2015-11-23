@@ -80,18 +80,31 @@ module Model {
 
   /** returns an error message if there was some error */
   private function maybe((list(string), graph)) parse_cfg(string file){
-    string cfg_folder = Uri.encode_string(file);
+    string cfg_folder = "cfgs/" ^ Uri.encode_string(file) ^ "/";
     // TODO do not only parse main.dot but also the other methods
-    string dot_file = "cfgs/" ^ cfg_folder ^ "/main.dot";
-    if(File.exists(dot_file)){
-      string s = FileUtils.read(dot_file);
-      result = GraphParser.parse_graph(s);
-      match(result){
-        case {some: g}:
-          {success: g};
-        case {none}:
-          {error: "Error while parsing dot file"}
-      }
+    // string dot_file = cfg_folder ^ "/main.dot";
+    if(File.exists(cfg_folder)){
+      List.fold(function(x, acc){
+        match(x){
+          case {dir: _}: acc
+          case {file: f}:
+            Log.debug("Model", "reading " ^ f);
+            dot = FileUtils.read(cfg_folder ^ f);
+            Log.debug("Model", "{dot}");
+            result = GraphParser.parse_graph(dot);
+            match(result){
+              case {some: (ss, gs)}:
+                match(acc){
+                  case {error: _}: {success: (ss, gs)}
+                  case {success: (starts, graph)}:
+                    merged_graph = Map.union(gs, graph);
+                    {success: (ss ++ starts, merged_graph)};
+                }
+              case {none}: acc
+            }
+        }
+
+      }, FileUtils.ls(cfg_folder), {error: "Error parsing dot file"});
     }else{
       {error: "Goblint did not produce a dot file"}
     }

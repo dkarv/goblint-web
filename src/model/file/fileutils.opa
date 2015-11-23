@@ -8,10 +8,10 @@ module FileUtils {
     File.write(path, content);
   }
 
-  exposed function ls(string path){
+  exposed function sorted_ls(string path){
     int n = String.length(path);
     path = if(String.char_at(path, n-1) != 47 && File.is_directory(path)){
-      // paths should end with '/' = 47 always
+      // paths should end with '/' == 47 always
       path ^ "/";
     }else{ path }
     List.sort_with(function(a, b){
@@ -31,7 +31,11 @@ module FileUtils {
               String.ordering(f2, f1);
             }
       }
-    },match(File.readdir(path)){
+    },ls(path));
+  }
+
+  exposed function ls(string path){
+    match(File.readdir(path)){
       case {success: ls}:
         LowLevelArray.filter_map_to_list(function(elem){
           {some:
@@ -44,6 +48,6 @@ module FileUtils {
         }, ls);
       case {failure: _}:
         []
-      });
+    };
   }
 }
