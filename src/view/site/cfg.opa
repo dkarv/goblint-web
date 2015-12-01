@@ -16,8 +16,13 @@ module Cfg{
   client function load(string id, g){
     %%Util.pushState%%("/ana/" ^ id ^ "/cfg");
     %%DotRenderer.draw%%(g, callback);
+
     Dom.set_value(#collapse-sel, "none");
-    search_changed();
+    if(search_changed() == false){
+      // get the list of dead nodes and highlight them
+      unreach = Database.get_unreachables(id);
+      %%DotRenderer.highlight%%(unreach, "red");
+    }
   }
 
   /** if is displayed right at the moment, reload the cfg */
@@ -68,10 +73,14 @@ module Cfg{
   }
 
   client function search_change(_){
-    search_changed();
+    _ = search_changed();
+    void
   }
 
-  client function search_changed(){
+  /**
+   * returns whether there was a search query
+   */
+  client function bool search_changed(){
     string query = Dom.get_value(#search_cfg);
     if((query == "") == false){
       match(Site.get_analysis_id()){
@@ -79,7 +88,7 @@ module Cfg{
           option(list(string)) ls = Search.parse_and_search(id, query);
             match(ls){
               case {some: ss}:
-                %%DotRenderer.highlight%%(ss);
+                %%DotRenderer.highlight%%(ss, "green");
                 Site.hide_message();
                 Dom.set_style_property_unsafe(#search_cfg, "border-color", "#3c763d");
               case {none}:
@@ -89,6 +98,9 @@ module Cfg{
         case {none}:
           Log.error("Cfg","no analysis id found");
       }
+      true
+    } else {
+      false
     }
   }
 }

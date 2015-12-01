@@ -48,13 +48,14 @@ function add_edges(e) {
 }
 
 /**
- * @register {list(string) -> void}
+ * @register {list(string), string -> void}
  */
-function highlight(highlights) {
+function highlight(highlights, color) {
     console.log(highlights);
+    console.log(color);
     unhighlight();
     iter(highlights, function (elem) {
-        graph.setNode(elem, {style: "fill: green"});
+        graph.setNode(elem, {style: "fill: " + color});
     });
     render(graph, ".cfg");
 }
