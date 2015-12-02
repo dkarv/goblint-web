@@ -12,7 +12,7 @@ function register_line_handler(type, callback) {
  * @register {int, string, string -> void}
  */
 function add_warning(line, title, text) {
-    var elem = $('ol.linenums').children('li').eq(line);
+    var elem = $('ol.linenums').children('li').eq(line - 1);
     elem.addClass('warn');
     var oldtitle = elem.attr('title');
     if(oldtitle && oldtitle !== ''){
