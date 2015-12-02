@@ -7,7 +7,7 @@ PWD ?= $(shell pwd)
 # 8: everything
 # 7: debug, but not info
 # 6: default, no debug
-RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "$(PWD)"
+RUN_OPT = --verbose 8 --goblint "../analyzer/goblint" --localmode true --startfolder "$(PWD)/"
 OTHER_DEPENDS = resources/*
 CONFIG = --conf opa.conf --conf-opa-files
 FLAG = --opx-dir _build --import-package stdlib.database.mongo
