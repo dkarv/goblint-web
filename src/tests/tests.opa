@@ -21,6 +21,13 @@ module Tests {
         System.exit(0);
       }
     }
+    match(Cmd.debugparser()){
+      case {none}:
+        Log.debug("Tests","skip testing parser");
+      case {some: s}:
+        Log.debug("Tests","testing parser with: " ^ s);
+        ResultParser2.parse_file(s);
+    }
   }
   a =
     test();

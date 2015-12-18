@@ -1,0 +1,970 @@
+<run>
+    <parameters>../analyzer/goblint --disable allfuns --disable allglobs --set ana.activated ['escape','base','mutex']
+        --enable ana.arinc.assume_success --enable ana.arinc.debug_pml --enable ana.arinc.export --enable
+        ana.arinc.merge_globals --enable ana.arinc.simplify --enable ana.arinc.validate --set ana.cont.class ''
+        --disable ana.cont.localclass --set ana.ctx_insens ['OSEK2','stack_loc','stack_trace','stack_trace_set','OSEK']
+        --disable ana.file.optimistic --enable ana.hashcons --disable ana.int.cdebug --disable ana.int.cinterval --set
+        ana.int.cnarrow 'basic' --set ana.int.cwiden 'basic' --disable ana.int.interval --enable ana.int.trier --disable
+        ana.osek.check --enable ana.osek.def_header --enable ana.osek.defaults --set ana.osek.flags [] --disable
+        ana.osek.intrpts --set ana.osek.isrprefix 'function_of_' --set ana.osek.isrsuffix '' --set ana.osek.names []
+        --set ana.osek.oil '' --set ana.osek.safe_isr [] --set ana.osek.safe_task [] --set ana.osek.safe_vars [] --set
+        ana.osek.taskprefix 'function_of_' --set ana.osek.tasksuffix '' --disable ana.osek.warnfiles --set ana.path_sens
+        ['uninit','OSEK2','OSEK','depmutex','mutex','malloc_null'] --set ana.restart_count 1 --set ana.spec.file ''
+        --disable ana.warnings --disable colors --set comparesolver '' --set cppflags '' --set custom_incl '' --set
+        custom_includes [] --disable custom_libc --set dbg.cilout '' --disable dbg.ctxinfo --disable dbg.debug --set
+        dbg.dump '' --set dbg.filter '' --disable dbg.print_dead_code --disable dbg.showtemps --set dbg.slice.n 10
+        --disable dbg.slice.on --disable dbg.solver-progress --set dbg.timeout 0 --disable dbg.uncalled --disable
+        dbg.verbose --disable dopartial --disable dump_globs --set exitfun [] --disable exp.addr-context --disable
+        exp.back_loop_sep --enable exp.cfgdot --set exp.check [] --disable exp.earlyglobs --disable exp.eclipse
+        --disable exp.failing-locks --disable exp.field-insensitive --disable exp.field_insensitive --disable
+        exp.forward --disable exp.full-context --set exp.g2html_path '.' --disable exp.globs_are_top --disable
+        exp.list-type --disable exp.malloc-fail --disable exp.mincfg --disable exp.need --disable exp.nested --disable
+        exp.no-int-context --set exp.precious_globs [] --enable exp.privatization --disable exp.region-offsets --disable
+        exp.sharir-pnueli --disable exp.single-threaded --disable exp.type-inv --set exp.unique [] --enable
+        exp.unknown_funs_spawn --enable exp.use_gen_solver --enable exp.volatiles_are_top --disable exp.write-races
+        --disable g2html --disable gccwarn --set includes [] --disable interact.enabled --set interact.out 'result'
+        --disable interact.paused --enable justcfg --disable justcil --disable keepcpp --disable kernel --set
+        kernel_includes [] --set mainfun ['main'] --enable merge-conflicts --disable nonstatic --disable noverify --set
+        otherfun [] --set outfile 'result.xml' --set phases [] --disable printstats --set questions.file '' --set result
+        'fast_xml' --set solver 'effectWCon' --disable solverdiffs --set trans.activated []
+        /mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c
+    </parameters>
+    <result>
+        <file name="01-assert.c" path="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c">
+            <function name="main">
+                <node name="7"/>
+                <node name="4"/>
+                <node name="fun283"/>
+                <node name="3"/>
+                <node name="6"/>
+                <node name="9"/>
+                <node name="ret283"/>
+                <node name="2"/>
+                <node name="1"/>
+                <node name="5"/>
+            </function>
+        </file>
+        <call id="5" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="10" order="506">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+
+            <path>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        success
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        silence
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        fail
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        unknown
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </path>
+        </call>
+        <call id="1" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="5" order="418">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+
+            <path>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        success
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                    <key>
+                                        silence
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                    <key>
+                                        fail
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                    <key>
+                                        unknown
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </path>
+        </call>
+        <call id="2" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="6" order="437">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+
+            <path>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        success
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        silence
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                    <key>
+                                        fail
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                    <key>
+                                        unknown
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </path>
+        </call>
+        <call id="ret283" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="4" order="403">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+        </call>
+        <call id="9" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="13" order="558">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+        </call>
+        <call id="6" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="11" order="522">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+        </call>
+        <call id="3" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="7" order="456">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+
+            <path>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        success
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        silence
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        fail
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                    <key>
+                                        unknown
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </path>
+        </call>
+        <call id="fun283" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="4" order="403">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+
+            <path>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </path>
+        </call>
+        <call id="4" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="9" order="487">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+
+            <path>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        success
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        silence
+                                    </key>
+                                    <value>
+                                        <data>
+                                            1
+                                        </data>
+                                    </value>
+                                    <key>
+                                        fail
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        unknown
+                                    </key>
+                                    <value>
+                                        <data>
+                                            Unknown int
+                                        </data>
+                                    </value>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </path>
+        </call>
+        <call id="7" file="/mnt/hdd/home/git/analyzer/tests/regression/00-sanity/01-assert.c" line="12" order="546">
+            <context>
+                <analysis name="escape">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+                <analysis name="base">
+                    <value>
+                        <map>
+                            <key>
+                                value domain
+                            </key>
+                            <value>
+                                <map>
+                                </map>
+                            </value>
+                            <key>
+                                flag domain
+                            </key>
+                            <value>
+                                <map>
+                                    <key>
+                                        MT mode
+                                    </key>
+                                    <value>
+                                        <data>
+                                            0
+                                        </data>
+                                    </value>
+                                    <key>
+                                        Thread
+                                    </key>
+                                    main
+                                </map>
+                            </value>
+                        </map>
+                    </value>
+                </analysis>
+                <analysis name="mutex">
+                    <value>
+                        <set>
+                        </set>
+                    </value>
+                </analysis>
+            </context>
+        </call>
+    </result>
+</run>

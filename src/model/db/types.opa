@@ -72,19 +72,22 @@ type fkt = {
 type file = {
   string name,
   string path,
-  list(fkt) fkt
+  stringmap(fkt) fkt
 }
 
 type run = {
   string parameters,
-  list(file) files,
+  // file.path -> file
+  stringmap(file) files,
   intmap(call) line_calls,
-  stringmap(call) id_calls,
+  stringmap(int) id_to_line,
   list(string) call_ids,
   list(analysis) globs,
   list(warning) warnings,
   list(string) unreachables
 }
+
+type maybe('a) = {'a success} or {string error}
 
 module Types{
 

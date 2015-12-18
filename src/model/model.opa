@@ -1,5 +1,3 @@
-type maybe('a) = {'a success} or {string error}
-
 module Model {
 
   /** this method is called after an upload and goblint has been called already. */
@@ -71,12 +69,12 @@ module Model {
       case {none}:
         {error: "opalang parse error. maybe xml-json is not installed (globally)? npm install xml-json -g"}
       case ~{some}:
-        match(ResultParser.parse_json(some)){
-          case {none}:
-            {error: "error while doing ResultParser.parse_json()"}
-          case {some: res}:
-            {success: res}
-        }
+        //match(ResultParser.parse_json(some)){
+        //  case {none}:
+            {error: "old parser removed"}
+        //  case {some: res}:
+        //    {success: res}
+        //}
     }
   }
 

@@ -25,12 +25,16 @@ BUILDDIR ?= _build
 export BUILDDIR
 # PLUGINS = $(patsubst %, $(BUILDDIR)/%.opp, $(basename $(notdir $(wildcard plugins/*.js))))
 PLUGINS = $(BUILDDIR)/dotrenderer.opp $(BUILDDIR)/util.opp $(BUILDDIR)/prettify.opp
+#  $(BUILDDIR)/reader.opp
+NODEJS =
+
+# plugins/reader.nodejs
 
 default: exe
 
 # compile the plugins
 $(BUILDDIR)/%.opp: plugins/%.js
-# hack: remove all opx to ensure the .opp files are not cached
+	# hack: remove all opx to ensure the .opp files are not cached
 	rm -rf $(wildcard $(BUILDDIR)/*.opx)
 	opa-plugin-builder --js-validator-off $^ --build-dir $(BUILDDIR) -o $(@F)
 
@@ -46,6 +50,9 @@ test: exe
 debug: exe
 	$(RUN_CMD) $(RUN_OPT) --testfile $(file) || true #--opentests "google-chrome"
 
+parse: exe
+	$(RUN_CMD) $(RUN_OPT) --debugparser result.xml
+
 exe: $(EXE)
 
 pack:
@@ -54,7 +61,7 @@ pack:
 # EXECUTABLE BUILDING
 $(EXE): pack $(PLUGINS)
 	@echo "### Building executable $(EXE)"
-	$(OPA) $(CONFIG) $(PLUGINS) -o $@ --build-dir $(BUILDDIR)/$(EXE)
+	$(OPA) $(CONFIG) $(PLUGINS) $(NODEJS) -o $@ --build-dir $(BUILDDIR)/$(EXE)
 
 $(EXE:%.exe=%.run) : $(EXE)
 	./$(EXE) -p $(PORT)

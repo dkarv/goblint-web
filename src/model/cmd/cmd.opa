@@ -3,7 +3,8 @@ type parameters = {
   bool localmode,
   string startfolder,
   option(string) testfile,
-  option(string) opentests
+  option(string) opentests,
+  option(string) debugparser
 }
 
 module Cmd {
@@ -12,7 +13,8 @@ module Cmd {
     localmode: false,
     startfolder: "/",
     testfile: {none},
-    opentests: {none}};
+    opentests: {none},
+    debugparser: {none}};
 
   private CommandLine.family(parameters) par_family = {
     title: "Goblint Web parameters",
@@ -58,6 +60,14 @@ module Cmd {
         on_param: function(state) {
           parser { case y=Rule.consume: {no_params: {state with opentests: {some: y}}}}
         }
+      },
+      { CommandLine.default_parser with
+        names: ["--debugparser"],
+        description: "debug the result parser with this file",
+        param_doc: "<string>",
+        on_param: function(state){
+          parser {case y=Rule.consume: {no_params: {state with debugparser: {some: y}}}}
+        }
       }
     ]
   }
@@ -78,5 +88,9 @@ module Cmd {
 
   function opentests(){
     args.opentests;
+  }
+
+  function debugparser(){
+    args.debugparser;
   }
 }
