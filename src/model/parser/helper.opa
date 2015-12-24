@@ -33,6 +33,30 @@ module Util {
       name
   }
 
+  call_parser = parser {
+    case "<call " id=attr("id") " " file=attr("file") " line=\""
+      line=Rule.natural "\" order=\""  order=Rule.natural "\">":
+        {~id, ~file, ~line, ~order, context: Map.empty, path: Map.empty};
+  }
+
+  context_parser = parser {
+    case "<context>": void
+  }
+
+  analysis_parser = parser {
+    case "<analysis " name=attr("name") ">": name
+  }
+
+  value_parser = parser {
+    case "<value>": void
+  }
+
+  inner_value = parser {
+    case "<map>": {map}
+    case "<set>": {set}
+    case "<data>": {data}
+  }
+
   function start_tag(string tag){
     parser {
       case "<{tag}" (![">"] .)* ">": void

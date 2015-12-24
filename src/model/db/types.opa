@@ -30,6 +30,11 @@ type ana = {
   list(string) start_nodes,
   run run
 }
+// FIXME deprecated: remove this type
+type analysis = {
+  string name,
+  value val
+}
 
 type value = {
   stringmap(value) map
@@ -39,18 +44,14 @@ type value = {
   string data
 }
 
-type analysis = {
-  string name,
-  value val
-}
-
 type call = {
   string id,
   string file,
   int line,
   int order,
-  // list(context, path)
-  list((list(analysis), list(analysis))) anas
+  // index of context/path -> (ana.name -> ana.value)
+  intmap(stringmap(value)) context,
+  intmap(stringmap(value)) path
 }
 
 type warnitem = {
@@ -82,7 +83,7 @@ type run = {
   intmap(call) line_calls,
   stringmap(int) id_to_line,
   list(string) call_ids,
-  list(analysis) globs,
+  stringmap(value) globs,
   list(warning) warnings,
   list(string) unreachables
 }

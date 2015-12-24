@@ -40,13 +40,14 @@ module Src{
       load(id);
 
       // reload the local information
-      string line_str = Dom.get_attribute_unsafe(#loc-container, "data-line");
-      if(String.is_empty(line_str) == {false}){
-        int line = Int.of_string(line_str);
-        c = Database.get_call_by_line(id, line);
-        list(analysis) globs = Database.get_globs(id);
-        Site.set_information(#loc-container, c, globs, line_str);
-      }
+      // string line_str = Dom.get_attribute_unsafe(#loc-container, "data-line");
+      // if(String.is_empty(line_str) == {false}){
+        // int line = Int.of_string(line_str);
+        // c = Database.get_call_by_line(id, line);
+        // FIXME
+        // list(analysis) globs = Database.get_globs(id);
+        // Site.set_information(#loc-container, c, globs, line_str);
+      // }
     }
   }
 
@@ -57,8 +58,9 @@ module Src{
       case {some: id}:
         c = Database.get_call_by_line(id, line);
         Log.debug("Src","call: {c}");
-        list(analysis) globs = Database.get_globs(id);
-        Site.set_information(#loc-container, c, globs, "{line}")
+        // FIXME
+        // list(analysis) globs = Database.get_globs(id);
+        // Site.set_information(#loc-container, c, globs, "{line}")
         Dom.set_attribute_unsafe(#loc-container, "data-line","{line}")
     }
   }

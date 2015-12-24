@@ -48,6 +48,50 @@ module Site {
       Dom.add_class(Dom.select_id("pill-{id}"), "active");
     };
 
+    /*
+     * code that was at FIXME:
+     {List.init(function(i){
+                   id = "ctx{i}";
+                   act = if(i==0){ "active" }else { "" };
+                   <li
+                     onclick={clickme(id, _)}
+                     id="pill-{id}"
+                     class="ctx-pill {act}"
+                   ><a>{i + 1}</a></li>
+                 }, List.length(cl.anas))}
+                 {if(no_globs){
+                   <></>
+                 }else{
+                   <li
+                     id="pill-glob"
+                     class="ctx-pill"
+                     onclick={clickme("glob", _)}>
+                     <a>Glob</a>
+                   </li>
+                 }}
+     */
+
+     /* second FIXME:
+     {List.mapi(function(i, (contexts, paths)){
+                   act = if(i==0){ "active" }else{ "" };
+                   <div id="ctx{i}" class="ctx tab-pane {act}">
+                     <h4>Context: </h4>
+                       {Ana.print_analysis(contexts)}
+                     <h4>Path: </h4>
+                       {Ana.print_analysis(paths)}
+                   </div>
+                 }, cl.anas);}
+                 {if(no_globs){
+                   <></>
+                 } else {
+                   <div id="glob" class="ctx tab-pane">
+                     <h4>Globals: </h4>
+                     {Ana.print_analysis(globs)}
+                   </div>
+                 }}
+
+     */
+
     res = match(c){
       case {none}: <h3>No information available</h3>
       case {some: cl}:
@@ -55,44 +99,10 @@ module Site {
         <>
           <h3>{line_id}:</h3>
           <ul class="nav nav-pills nav-justified">
-            {List.init(function(i){
-              id = "ctx{i}";
-              act = if(i==0){ "active" }else { "" };
-              <li
-                onclick={clickme(id, _)}
-                id="pill-{id}"
-                class="ctx-pill {act}"
-              ><a>{i + 1}</a></li>
-            }, List.length(cl.anas))}
-            {if(no_globs){
-              <></>
-            }else{
-              <li
-                id="pill-glob"
-                class="ctx-pill"
-                onclick={clickme("glob", _)}>
-                <a>Glob</a>
-              </li>
-            }}
+            <li>FIXME implement for new structure</li>
           </ul>
           <div class="tab-content">
-            {List.mapi(function(i, (contexts, paths)){
-              act = if(i==0){ "active" }else{ "" };
-              <div id="ctx{i}" class="ctx tab-pane {act}">
-                <h4>Context: </h4>
-                  {Ana.print_analysis(contexts)}
-                <h4>Path: </h4>
-                  {Ana.print_analysis(paths)}
-              </div>
-            }, cl.anas);}
-            {if(no_globs){
-              <></>
-            } else {
-              <div id="glob" class="ctx tab-pane">
-                <h4>Globals: </h4>
-                {Ana.print_analysis(globs)}
-              </div>
-            }}
+            <a>FIXME!</a>
           </div>
         </>
     }

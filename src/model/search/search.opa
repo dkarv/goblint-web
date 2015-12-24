@@ -99,7 +99,9 @@ module Search {
 
   private function list(string) satisfies((string -> bool) f, string searchVar, stringmap(call) calls){
     // TODO maybe it's also possible to do this in database queries
-    Map.fold(function(key, val, acc){
+    // FIXME adapt to new datatypes
+    List.empty;
+    /*Map.fold(function(key, val, acc){
       List.fold(function((_, paths), acc){
         List.fold(function(ana, acc){
           if(String.eq("base", ana.name)){
@@ -113,7 +115,7 @@ module Search {
           }
         }, paths, acc);
       }, val.anas, acc);
-    }, calls, []);
+    }, calls, []);*/
   }
 
   private function bool satisfies_helper((string -> bool) f, string searchVar, val){

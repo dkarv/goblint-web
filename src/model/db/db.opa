@@ -27,8 +27,11 @@ module Database {
     }
   }
 
-  exposed function list(analysis) get_globs(string id){
-    /anas/all[id == id]/run/globs;
+  // exposed
+  function list(value) get_globs(string id){
+    // FIXME
+    // /anas/all[id == id]/run/globs;
+    List.empty
   }
 
   exposed function list(string) get_unreachables(string id){
@@ -72,29 +75,39 @@ module Database {
 
   // for the new parser:
   function save_parameter(string id, string parameter){
-    Log.debug("save_parameter:","{id}");
+    Log.debug("save_parameter for:","{id}");
     /anas/all[~{id}]/run/parameters <- parameter;
   }
 
   function add_file(string id, file){
-    Log.debug("add_file:","{file.path}");
+    // Log.debug("add_file:","{file.path}");
     /anas/all[~{id}]/run/files[file.path] <- file;
   }
 
   function add_fkt(string id, string file_path, fkt){
-    Log.debug("add_fkt:","{file_path} -> {fkt.name}");
+    // Log.debug("add_fkt:","{file_path} -> {fkt.name}");
     /anas/all[~{id}]/run/files[file_path]/fkt[fkt.name] <- fkt;
   }
 
   function add_fkt_node(string id, string file_path, string fkt_name, string node){
-    Log.debug("add_fkt_node:","{fkt_name} -> {node}");
+    // Log.debug("add_fkt_node:","{fkt_name} -> {node}");
     /anas/all[~{id}]/run/files[file_path]/fkt[fkt_name]/nodes <+ node;
   }
 
   function add_call(string id, call c){
-    Log.debug("add_call:","{c.id},{c.line}");
+    // Log.debug("add_call:","{c.id},{c.line}");
     /anas/all[~{id}]/run/line_calls[c.line] <- c;
     /anas/all[~{id}]/run/id_to_line[c.id] <- c.line;
     /anas/all[~{id}]/run/call_ids <+ c.id;
   }
+
+  function add_context_ana(string id, int call_line, int ctx, string name, val){
+    Log.debug("add_ctx:","ana: {name}");
+    /anas/all[~{id}]/run/line_calls[call_line]/context[ctx][name] <- val;
+  }
+
+  function add_path_ana(string id, int call_line, int path, string name, val){
+      Log.debug("add_path:","ana: {name}");
+      /anas/all[~{id}]/run/line_calls[call_line]/path[path][name] <- val;
+    }
 }

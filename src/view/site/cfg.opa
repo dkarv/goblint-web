@@ -33,11 +33,11 @@ module Cfg{
       load(id, g);
       string line_str = Dom.get_attribute_unsafe(#loc2-container, "data-line");
       Log.debug("Src", "try to show line: {line_str}");
-      if(String.is_empty(line_str) == {false}){
-        c = Database.get_call_by_id(id, line_str);
-        list(analysis) globs = Database.get_globs(id);
-        Site.set_information(#loc2-container, c, globs, line_str);
-      }
+      // if(String.is_empty(line_str) == {false}){
+      //   c = Database.get_call_by_id(id, line_str);
+      //   list(analysis) globs = Database.get_globs(id);
+      //   Site.set_information(#loc2-container, c, globs, line_str);
+      // }
     }
   }
 
@@ -48,8 +48,8 @@ module Cfg{
       case {some: id}:
         c = Database.get_call_by_id(id, line_id);
         Log.debug("Cfg","call: {c}");
-        list(analysis) globs = Database.get_globs(id);
-        Site.set_information(#loc2-container, c, globs, line_id);
+        // list(analysis) globs = Database.get_globs(id);
+        // Site.set_information(#loc2-container, c, globs, line_id);
         Dom.set_attribute_unsafe(#loc2-container, "data-line","{line_id}");
         Log.debug("View","loc");
     }
